@@ -4,15 +4,6 @@
   "description": "Short-term prediction market on Avalanche Fuji testnet",
   "main": "index.js",
   "scripts": {
-    "compile": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.js --network fuji",
-    "deploy:tusdc": "hardhat run scripts/deploy-tusdc.js --network fuji",
-    "deploy:tusdc-market": "hardhat run scripts/deploy-tusdc-market.js --network fuji",
-    "deploy:relay-stack": "hardhat run scripts/deploy-relay-stack.js --network fuji",
-    "test": "hardhat test",
-    "test-price-feeds": "hardhat run scripts/test-price-feeds.js --network fuji",
-    "keeper": "node scripts/keeper.js",
-    "agent-runner": "node scripts/agent-runner.js",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
