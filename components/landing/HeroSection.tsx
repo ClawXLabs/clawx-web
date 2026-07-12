@@ -396,25 +396,65 @@ export default function HeroSection({ account, onConnect }: HeroSectionProps) {
             no gas required from your wallet.
           </p>
 
-          <Link href="/markets" style={{ textDecoration: 'none' }}>
+          {/* Private Beta Notice */}
+          <div
+            style={{
+              background: 'rgba(192, 57, 43, 0.08)',
+              border: '1px solid #C0392B',
+              borderRadius: 4,
+              padding: '12px 16px',
+              marginBottom: 20,
+              maxWidth: 480,
+            }}
+          >
+            <p
+              style={{
+                fontFamily: '"Courier New", monospace',
+                fontSize: 10,
+                fontWeight: 700,
+                color: '#C0392B',
+                margin: 0,
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+              }}
+            >
+              ◆ Private Beta Active
+            </p>
+            <p
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontSize: 12,
+                lineHeight: 1.5,
+                color: '#3A3530',
+                margin: '4px 0 0 0',
+              }}
+            >
+              Access is currently restricted to approved pilot addresses. Address validation is performed automatically upon connection.
+            </p>
+          </div>
+
+          <a href="https://app.clawxlab.xyz" style={{ textDecoration: 'none', alignSelf: 'flex-start' }}>
             <span
               className="np-cta-primary"
               style={{
                 display: 'inline-block',
-                background: '#E74141', color: '#FAF8F3',
+                background: '#0D0B08',
+                color: '#FAF8F3',
                 padding: isMobile ? '10px 20px' : '12px 28px',
                 fontFamily: '"Courier New", monospace',
-                fontSize: isMobile ? 9 : 11, fontWeight: 700,
-                letterSpacing: '0.16em', textTransform: 'uppercase',
+                fontSize: isMobile ? 9 : 11,
+                fontWeight: 700,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
                 cursor: 'pointer',
                 transition: 'background 0.2s ease',
               }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#C0392B'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = '#E74141'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#0D0B08'; }}
             >
-              ENTER MARKETS →
+              LAUNCH DASHBOARD ↗
             </span>
-          </Link>
+          </a>
         </div>
 
         {/* RIGHT: stats grid — positioned above the outlined crab */}
