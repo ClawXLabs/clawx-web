@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import CrabLogo from '../svgs/CrabLogo';
 
-const APP_URL = 'https://app.clawxlab.xyz';
+interface NavbarProps {
+  account?: string | null;
+  onConnect?: () => void;
+  onLaunchClick: () => void;
+}
 
-export default function Navbar() {
+export default function Navbar({ onLaunchClick }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -64,9 +68,9 @@ export default function Navbar() {
         </span>
       </Link>
 
-      {/* Right: Go to App Link */}
-      <a
-        href={APP_URL}
+      {/* Right: Go to App Button */}
+      <button
+        onClick={onLaunchClick}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -95,7 +99,7 @@ export default function Navbar() {
         }}
       >
         Go to App
-      </a>
+      </button>
     </nav>
   );
 }

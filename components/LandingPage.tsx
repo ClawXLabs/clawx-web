@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Navbar from './landing/Navbar';
 import HeroSection from './landing/HeroSection';
 import AssetMarquee from './landing/AssetMarquee';
@@ -5,6 +6,7 @@ import RoleCards from './landing/RoleCards';
 import MarketsPreview from './landing/MarketsPreview';
 import TimelineSection from './landing/TimelineSection';
 import Footer from './landing/Footer';
+import BetaAlertModal from './ui/BetaAlertModal';
 
 interface LandingPageProps {
   onConnectWallet: () => void;
@@ -30,18 +32,20 @@ interface LandingPageProps {
  *   .np-footer          → Footer entrance
  */
 export default function LandingPage({ onConnectWallet, account }: LandingPageProps) {
+  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
+
   return (
     <div
       className="np-root"
       style={{ background: '#FAF8F3', minHeight: '100vh' }}
     >
       {/* Fixed navigation */}
-      <Navbar account={account} onConnect={onConnectWallet} />
+      <Navbar account={account} onConnect={onConnectWallet} onLaunchClick={() => setIsBetaModalOpen(true)} />
 
       {/* Main editorial content */}
       <main>
         {/* 1 — Hero: editorial headline + stats grid */}
-        <HeroSection account={account} onConnect={onConnectWallet} />
+        <HeroSection account={account} onConnect={onConnectWallet} onLaunchClick={() => setIsBetaModalOpen(true)} />
 
         {/* 2 — Scrolling ticker band */}
         <AssetMarquee />
@@ -58,6 +62,9 @@ export default function LandingPage({ onConnectWallet, account }: LandingPagePro
 
       {/* Dark editorial footer */}
       <Footer account={account} onConnect={onConnectWallet} />
+
+      {/* Private Beta Modal */}
+      <BetaAlertModal isOpen={isBetaModalOpen} onClose={() => setIsBetaModalOpen(false)} />
     </div>
   );
 }
