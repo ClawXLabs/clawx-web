@@ -9,6 +9,7 @@ import CrabLogoOutline from '../svgs/CrabLogoOutline';
 interface HeroSectionProps {
   account: string | null;
   onConnect: () => void;
+  onLaunchClick: () => void;
 }
 
 interface Stat {
@@ -247,7 +248,7 @@ function AssetCell({ asset, index }: { asset: Asset; index: number }) {
 }
 
 // ─── Hero Section ───────────────────────────────────────────────────────────
-export default function HeroSection({ account, onConnect }: HeroSectionProps) {
+export default function HeroSection({ account, onConnect, onLaunchClick }: HeroSectionProps) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -396,44 +397,16 @@ export default function HeroSection({ account, onConnect }: HeroSectionProps) {
             no gas required from your wallet.
           </p>
 
-          {/* Private Beta Notice */}
-          <div
+          <button
+            onClick={onLaunchClick}
             style={{
-              background: 'rgba(192, 57, 43, 0.08)',
-              border: '1px solid #C0392B',
-              borderRadius: 4,
-              padding: '12px 16px',
-              marginBottom: 20,
-              maxWidth: 480,
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              alignSelf: 'flex-start',
+              cursor: 'pointer',
             }}
           >
-            <p
-              style={{
-                fontFamily: '"Courier New", monospace',
-                fontSize: 10,
-                fontWeight: 700,
-                color: '#C0392B',
-                margin: 0,
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-              }}
-            >
-              ◆ Private Beta Active
-            </p>
-            <p
-              style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                fontSize: 12,
-                lineHeight: 1.5,
-                color: '#3A3530',
-                margin: '4px 0 0 0',
-              }}
-            >
-              Access is currently restricted to approved pilot addresses. Address validation is performed automatically upon connection.
-            </p>
-          </div>
-
-          <a href="https://app.clawxlab.xyz" style={{ textDecoration: 'none', alignSelf: 'flex-start' }}>
             <span
               className="np-cta-primary"
               style={{
@@ -446,7 +419,6 @@ export default function HeroSection({ account, onConnect }: HeroSectionProps) {
                 fontWeight: 700,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
-                cursor: 'pointer',
                 transition: 'background 0.2s ease',
               }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#C0392B'; }}
@@ -454,7 +426,7 @@ export default function HeroSection({ account, onConnect }: HeroSectionProps) {
             >
               LAUNCH DASHBOARD ↗
             </span>
-          </a>
+          </button>
         </div>
 
         {/* RIGHT: stats grid — positioned above the outlined crab */}
