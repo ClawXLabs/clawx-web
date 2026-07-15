@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import WalletAnimation from "../ui/WalletAnimation";
@@ -40,14 +40,20 @@ const STEPS = [
   },
 ];
 
-// Card 1 anchors at 0%. Cards 2-4 slide in and rest at 75%, 50%, 25%.
-const REST_POSITIONS = [0, 0.25, 0.5, 0.75];
-
 export default function TimelineSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const progressFillRef = useRef<HTMLDivElement>(null);
-  const dotsRef = useRef<(HTMLDivElement | null)[]>([]);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -55,37 +61,20 @@ export default function TimelineSection() {
     if (!section || !fill) return;
 
     const cards = cardsRef.current.filter(Boolean) as HTMLDivElement[];
-    const dots = dotsRef.current;
     const totalSteps = STEPS.length;
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // gsap.context() scopes every tween and ScrollTrigger created inside it to
-    // this component instance. When ctx.revert() is called on cleanup it undoes
-    // all GSAP work — including removing the pin spacer node — without ever
-    // touching React-managed DOM nodes. This is what prevents the
-    // "Node.removeChild: node is not a child" crash that occurs when:
-    //   1. React StrictMode double-invokes the effect and unmounts on the first
-    //      pass while GSAP's pin spacer is still in the tree, or
-    //   2. ScrollTrigger.getAll().kill() removes ScrollTriggers from *other*
-    //      component instances, leaving orphaned spacers behind.
-    // ─────────────────────────────────────────────────────────────────────────
     const ctx = gsap.context(() => {
       /* ── Initial states ── */
       cards.forEach((card, i) => {
-        gsap.set(card, i === 0 ? { left: "0%", opacity: 1 } : { left: "100%", opacity: 0 });
-      });
-
-      /* ── Dot helper ── */
-      const setActiveDot = (index: number) => {
-        dots.forEach((d, i) => {
-          if (!d) return;
-          d.style.background = i <= index ? "#C0392B" : "rgba(13,11,8,0.15)";
-          d.style.transform =
-            i === index ? "scale(1.4)" : i < index ? "scale(1.1)" : "scale(1)";
+        const leftPos = isMobile ? "0%" : `${i * 25}%`;
+        const widthVal = isMobile ? "100%" : "25%";
+        gsap.set(card, {
+          left: leftPos,
+          width: widthVal,
+          top: i === 0 ? "0%" : "100%",
+          opacity: i === 0 ? 1 : 0,
         });
-      };
-
-      setActiveDot(0);
+      });
 
       /* ── Master scrub timeline ── */
       const tl = gsap.timeline({
@@ -99,19 +88,16 @@ export default function TimelineSection() {
           anticipatePin: 1,
           onUpdate: (self) => {
             fill.style.width = self.progress * 100 + "%";
-            const rawStep = self.progress * (totalSteps - 1);
-            setActiveDot(Math.min(Math.round(rawStep), totalSteps - 1));
           },
         },
       });
 
-      // Phase i (0-indexed from 1): card slides in during timeline [i-1 … i]
+      // Phase i (0-indexed from 1): card slides up from bottom during timeline [i-1 … i]
       for (let i = 1; i < totalSteps; i++) {
-        const restPct = REST_POSITIONS[i] * 100;
         // Fade in quickly at phase start
         tl.to(cards[i], { opacity: 1, duration: 0.15, ease: "none" }, i - 1);
-        // Slide from 100% to rest position over the full phase
-        tl.to(cards[i], { left: `${restPct}%`, duration: 1, ease: "power2.inOut" }, i - 1);
+        // Slide from 100% to 0% (top position) over the full phase
+        tl.to(cards[i], { top: "0%", duration: 1, ease: "power2.inOut" }, i - 1);
       }
 
       /* ── Entry Animation for WalletAnimation (Card 01) ── */
@@ -125,22 +111,20 @@ export default function TimelineSection() {
           ease: "none",
           scrollTrigger: {
             trigger: section,
-            start: "top 85%", // start when section is slightly into the viewport
-            end: "50% 50%",   // end when the section pins
+            start: "top 85%",
+            end: "50% 50%",
             scrub: true,
           },
         }
       );
 
       ScrollTrigger.refresh();
-    }, sectionRef); // ← scope to the section element
+    }, sectionRef);
 
     return () => {
-      // ctx.revert() cleanly reverses everything — tweens, ScrollTriggers, pin
-      // spacers — without ever calling removeChild on React-owned nodes.
       ctx.revert();
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <section
@@ -172,7 +156,7 @@ export default function TimelineSection() {
         <span
           style={{
             fontFamily: '"Courier New", monospace',
-            fontSize: 18,
+            fontSize: isMobile ? 14 : 18,
             fontWeight: 700,
             letterSpacing: "0.28em",
             textTransform: "uppercase",
@@ -213,17 +197,18 @@ export default function TimelineSection() {
             ref={(el) => { cardsRef.current[i] = el; }}
             style={{
               position: "absolute",
-              top: 0,
-              left: i === 0 ? "0%" : "100%", // GSAP takes over from here
-              width: "100%",
+              top: i === 0 ? "0%" : "100%",
+              left: isMobile ? "0%" : `${i * 25}%`,
+              width: isMobile ? "100%" : "25%",
               height: "100%",
               background: "#FAF8F3",
-              borderLeft: i > 0 ? "3px solid #0D0B08" : "none",
-              zIndex: i + 1, // each card sits on top of the previous
-              padding: "36px 28px",
+              borderLeft: (!isMobile && i > 0) ? "1px solid #0D0B08" : "none",
+              borderTop: (isMobile && i > 0) ? "3px solid #0D0B08" : "none",
+              zIndex: i + 1,
+              padding: isMobile ? "24px 20px" : "36px 24px",
               display: "flex",
               flexDirection: "column",
-              gap: 16,
+              gap: isMobile ? 12 : 16,
               opacity: i === 0 ? 1 : 0,
               boxSizing: "border-box",
             }}
@@ -233,7 +218,7 @@ export default function TimelineSection() {
               <span
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
-                  fontSize: 48,
+                  fontSize: isMobile ? 36 : 48,
                   fontWeight: 900,
                   lineHeight: 1,
                   color: "#E8E5DF",
@@ -260,7 +245,7 @@ export default function TimelineSection() {
             <h3
               style={{
                 fontFamily: 'Georgia, "Times New Roman", serif',
-                fontSize: 22,
+                fontSize: isMobile ? 18 : 22,
                 fontWeight: 900,
                 lineHeight: 1.2,
                 color: "#0D0B08",
@@ -281,32 +266,77 @@ export default function TimelineSection() {
                 lineHeight: 1.75,
                 color: "#5A5248",
                 margin: 0,
-                maxWidth: 360,
+                maxWidth: isMobile ? "100%" : 360,
               }}
             >
               {step.body}
             </p>
 
+            {/* Icons / Animations Container */}
             {i === 0 && (
-              <div style={{ marginTop: 'auto', transform: "scale(0.55)", transformOrigin: "left top", perspective: 1200 }}>
+              <div
+                style={{
+                  marginTop: "auto",
+                  marginBottom: "auto",
+                  transform: isMobile ? "scale(0.7)" : "scale(0.52)",
+                  transformOrigin: "center center",
+                  perspective: 1200,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
                 <div className="wallet-anim-container" style={{ transformOrigin: "bottom center" }}>
                   <WalletAnimation />
                 </div>
               </div>
             )}
             {i === 1 && (
-              <div style={{ flex: 1, minHeight: 0 }}>
+              <div
+                style={{
+                  flex: 1,
+                  minHeight: 0,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  transform: isMobile ? "scale(0.9)" : "scale(0.75)",
+                  transformOrigin: "center center",
+                }}
+              >
                 <MarketSelector />
               </div>
             )}
             {i === 2 && (
-              <div style={{ flex: 1, minHeight: 0, width: "100%" }}>
-                <UpnDown/>
+              <div
+                style={{
+                  flex: 1,
+                  minHeight: 0,
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  transform: isMobile ? "scale(0.9)" : "scale(0.75)",
+                  transformOrigin: "center center",
+                }}
+              >
+                <UpnDown />
               </div>
             )}
             {i === 3 && (
-              <div style={{ flex: 1, minHeight: 0, width: "100%" }}>
-                <CoinsNote/>
+              <div
+                style={{
+                  flex: 1,
+                  minHeight: 0,
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  transform: isMobile ? "scale(0.9)" : "scale(0.75)",
+                  transformOrigin: "center center",
+                }}
+              >
+                <CoinsNote />
               </div>
             )}
 
@@ -329,32 +359,6 @@ export default function TimelineSection() {
         ))}
       </div>
 
-      {/* ── Step dot indicators ── */}
-      {/* <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 7,
-            padding: "10px 0 4px",
-            flexShrink: 0,
-          }}
-        >
-          {STEPS.map((_, i) => (
-            <div
-              key={i}
-              ref={(el) => { dotsRef.current[i] = el; }}
-              style={{
-                width: 5,
-                height: 5,
-                borderRadius: "50%",
-                background: i === 0 ? "#C0392B" : "rgba(13,11,8,0.15)",
-                transition: "background 0.25s, transform 0.25s",
-                transform: i === 0 ? "scale(1.4)" : "scale(1)",
-              }}
-            />
-          ))}
-        </div> */}
-
       {/* ── Footer chain info ── */}
       <div
         style={{
@@ -363,8 +367,9 @@ export default function TimelineSection() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 32,
+          gap: isMobile ? 12 : 32,
           flexShrink: 0,
+          flexWrap: "wrap",
         }}
       >
         {["FastPrice Oracle", "Avalanche Fuji C-Chain", "Gasless Entry"].map((item, i) => (
@@ -382,7 +387,7 @@ export default function TimelineSection() {
               gap: 8,
             }}
           >
-            {i > 0 && <span style={{ color: "rgba(13,11,8,0.2)" }}>·</span>}
+            {i > 0 && !isMobile && <span style={{ color: "rgba(13,11,8,0.2)" }}>·</span>}
             {item}
           </span>
         ))}
