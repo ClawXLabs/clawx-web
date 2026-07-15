@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 interface Card {
@@ -62,6 +62,17 @@ function RoleCardCTA({ label, href }: { label: string; href: string }) {
 }
 
 export default function RoleCards() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <section
       id="modes"
@@ -99,24 +110,25 @@ export default function RoleCards() {
       </div>
 
       {/* Two-column card grid */}
-      <div className="np-cards-grid" style={{ display: 'flex' }}>
+      <div className="np-cards-grid" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
         {CARDS.map((card, i) => (
           <div
             key={card.id}
             className={`np-role-card np-role-card--${card.id}`}
             style={{
-              flex: '1 1 50%',
+              flex: isMobile ? '1 1 100%' : '1 1 50%',
               overflow: 'hidden',
               background: 'transparent',
               color: '#0D0B08',
-              borderRight: i === 0 ? '1px solid #0D0B08' : 'none',
+              borderRight: (!isMobile && i === 0) ? '1px solid #0D0B08' : 'none',
+              borderBottom: (isMobile && i === 0) ? '1px solid #0D0B08' : 'none',
             }}
           >
             <div
               style={{
-                width: '50vw',
-                minWidth: '400px',
-                padding: '48px 40px',
+                width: '100%',
+                minWidth: isMobile ? '0px' : '400px',
+                padding: isMobile ? '36px 24px' : '48px 40px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 24,
@@ -149,7 +161,7 @@ export default function RoleCards() {
                   letterSpacing: '-0.02em',
                   margin: 0,
                   color: 'inherit',
-                  whiteSpace: 'nowrap',
+                  whiteSpace: isMobile ? 'normal' : 'nowrap',
                 }}
               >
                 {card.headline}
