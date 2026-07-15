@@ -1,6 +1,11 @@
 import React from 'react';
 
-export default function Footer() {
+interface FooterProps {
+  account?: string | null;
+  onConnect?: () => void;
+}
+
+export default function Footer({ account, onConnect }: FooterProps) {
   return (
     <footer
       style={{
