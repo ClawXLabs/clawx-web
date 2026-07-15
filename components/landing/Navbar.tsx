@@ -74,9 +74,9 @@ export default function Navbar({ onLaunchClick }: NavbarProps) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          background: '#0D0B08',
+          background: '#E74141',
           color: '#FAF8F3',
-          border: '1.5px solid #0D0B08',
+          border: '1.5px solid #E74141',
           borderRadius: 24,
           padding: '8px 20px',
           fontFamily: '"Courier New", monospace',
@@ -90,12 +90,12 @@ export default function Navbar({ onLaunchClick }: NavbarProps) {
           whiteSpace: 'nowrap',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = '#C0392B';
-          e.currentTarget.style.borderColor = '#C0392B';
+          e.currentTarget.style.background = '#B03030';
+          e.currentTarget.style.borderColor = '#B03030';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = '#0D0B08';
-          e.currentTarget.style.borderColor = '#0D0B08';
+          e.currentTarget.style.background = '#E74141';
+          e.currentTarget.style.borderColor = '#E74141';
         }}
       >
         Go to App

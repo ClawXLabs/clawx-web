@@ -61,7 +61,7 @@ export default function LandingPage({ onConnectWallet, account }: LandingPagePro
       </main>
 
       {/* Dark editorial footer */}
-      <Footer account={account} onConnect={onConnectWallet} />
+      <Footer />
 
       {/* Private Beta Modal */}
       <BetaAlertModal isOpen={isBetaModalOpen} onClose={() => setIsBetaModalOpen(false)} />

@@ -411,7 +411,7 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
               className="np-cta-primary"
               style={{
                 display: 'inline-block',
-                background: '#0D0B08',
+                background: '#E74141',
                 color: '#FAF8F3',
                 padding: isMobile ? '10px 20px' : '12px 28px',
                 fontFamily: '"Courier New", monospace',
@@ -421,8 +421,8 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
                 textTransform: 'uppercase',
                 transition: 'background 0.2s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#C0392B'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = '#0D0B08'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#B03030'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#E74141'; }}
             >
               LAUNCH DASHBOARD ↗
             </span>

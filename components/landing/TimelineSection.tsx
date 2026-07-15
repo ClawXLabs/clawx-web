@@ -367,7 +367,7 @@ export default function TimelineSection() {
           flexShrink: 0,
         }}
       >
-        {["Chainlink Oracle", "Avalanche Fuji C-Chain", "Gasless Entry"].map((item, i) => (
+        {["FastPrice Oracle", "Avalanche Fuji C-Chain", "Gasless Entry"].map((item, i) => (
           <span
             key={item}
             style={{
