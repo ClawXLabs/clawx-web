@@ -13,10 +13,10 @@ gsap.registerPlugin(ScrollTrigger);
 // Adjust these scale factors to resize the icons/animations manually
 // for Mobile (viewport <= 768px) and PC (viewport > 768px) independently.
 const ICON_SCALES = {
-  wallet: { mobile: 0.7, pc: 0.52 },
-  market: { mobile: 0.9, pc: 0.75 },
-  upDown: { mobile: 0.9, pc: 0.75 },
-  coins:  { mobile: 0.9, pc: 0.75 },
+  wallet: { mobile: 0.6, pc: 0.45 },
+  market: { mobile: 0.8, pc: 0.65 },
+  upDown: { mobile: 0.8, pc: 0.65 },
+  coins:  { mobile: 0.8, pc: 0.65 },
 };
 
 const STEPS = [
@@ -76,11 +76,11 @@ export default function TimelineSection() {
     const ctx = gsap.context(() => {
       /* ── Initial states ── */
       cards.forEach((card, i) => {
-        const leftPos = isMobile ? "0%" : `${i * 25}%`;
-        const widthVal = isMobile ? "100%" : `${100 - i * 25}%`;
+        const heightVal = isMobile ? "100%" : `${100 - i * 25}%`;
         gsap.set(card, {
-          left: leftPos,
-          width: widthVal,
+          left: "0%",
+          width: "100%",
+          height: heightVal,
           top: i === 0 ? "0%" : "100%",
           opacity: i === 0 ? 1 : 0,
         });
@@ -102,12 +102,13 @@ export default function TimelineSection() {
         },
       });
 
-      // Phase i (0-indexed from 1): card slides up from bottom during timeline [i-1 … i]
+      // Phase i (0-indexed from 1): card slides up from bottom and rests at top offset [0%, 25%, 50%, 75%]
       for (let i = 1; i < totalSteps; i++) {
+        const restTop = isMobile ? "0%" : `${i * 25}%`;
         // Fade in quickly at phase start
         tl.to(cards[i], { opacity: 1, duration: 0.15, ease: "none" }, i - 1);
-        // Slide from 100% to 0% (top position) over the full phase
-        tl.to(cards[i], { top: "0%", duration: 1, ease: "power2.inOut" }, i - 1);
+        // Slide from 100% to resting position over the full phase
+        tl.to(cards[i], { top: restTop, duration: 1, ease: "power2.inOut" }, i - 1);
       }
 
       /* ── Entry Animation for WalletAnimation (Card 01) ── */
@@ -208,38 +209,37 @@ export default function TimelineSection() {
             style={{
               position: "absolute",
               top: i === 0 ? "0%" : "100%",
-              left: isMobile ? "0%" : `${i * 25}%`,
-              width: isMobile ? "100%" : `${100 - i * 25}%`,
-              height: "100%",
+              left: "0%",
+              width: "100%",
+              height: isMobile ? "100%" : `${100 - i * 25}%`,
               background: "#FAF8F3",
-              borderLeft: (!isMobile && i > 0) ? "1px solid #0D0B08" : "none",
-              borderTop: (isMobile && i > 0) ? "3px solid #0D0B08" : "none",
+              borderTop: i > 0 ? "3px solid #0D0B08" : "none",
               zIndex: i + 1,
-              padding: isMobile ? "24px 20px" : "36px 24px",
+              padding: isMobile ? "20px 16px" : "16px 40px",
               display: "flex",
               flexDirection: isMobile ? "column" : "row",
-              gap: isMobile ? 12 : 32,
+              alignItems: isMobile ? "stretch" : "center",
+              justifyContent: "space-between",
+              gap: isMobile ? 12 : 24,
               opacity: i === 0 ? 1 : 0,
               boxSizing: "border-box",
             }}
           >
-            {/* Left side: Text contents */}
+            {/* Column 1: Step Number + Title */}
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
-                width: isMobile ? "100%" : "280px",
+                gap: 8,
+                width: isMobile ? "100%" : "220px",
                 flexShrink: 0,
-                height: isMobile ? "auto" : "100%",
-                gap: 16,
               }}
             >
-              {/* Step number + tag */}
               <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
                 <span
                   style={{
                     fontFamily: 'Georgia, "Times New Roman", serif',
-                    fontSize: isMobile ? 36 : 48,
+                    fontSize: isMobile ? 32 : 36,
                     fontWeight: 900,
                     lineHeight: 1,
                     color: "#E8E5DF",
@@ -261,12 +261,10 @@ export default function TimelineSection() {
                   {step.tag}
                 </span>
               </div>
-
-              {/* Title */}
               <h3
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
-                  fontSize: isMobile ? 18 : 22,
+                  fontSize: isMobile ? 16 : 18,
                   fontWeight: 900,
                   lineHeight: 1.2,
                   color: "#0D0B08",
@@ -275,51 +273,32 @@ export default function TimelineSection() {
               >
                 {step.title}
               </h3>
-
-              {/* Thin rule */}
-              <div style={{ height: 1, background: "rgba(13,11,8,0.12)", flexShrink: 0 }} />
-
-              {/* Body */}
-              <p
-                style={{
-                  fontFamily: 'Georgia, "Times New Roman", serif',
-                  fontSize: 13,
-                  lineHeight: 1.75,
-                  color: "#5A5248",
-                  margin: 0,
-                  maxWidth: isMobile ? "100%" : 320,
-                }}
-              >
-                {step.body}
-              </p>
-
-              {/* Note */}
-              <p
-                style={{
-                  fontFamily: '"Courier New", monospace',
-                  fontSize: 9,
-                  fontWeight: 700,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "#888",
-                  margin: 0,
-                  marginTop: isMobile ? "8px" : "auto",
-                }}
-              >
-                ↳ {step.note}
-              </p>
             </div>
 
-            {/* Right side: Animation/Graphic Container */}
+            {/* Column 2: Body Description */}
+            <p
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontSize: 13,
+                lineHeight: 1.6,
+                color: "#5A5248",
+                margin: 0,
+                flex: 1,
+                maxWidth: isMobile ? "100%" : "420px",
+              }}
+            >
+              {step.body}
+            </p>
+
+            {/* Column 3: Animation/Graphic Container */}
             <div
               style={{
-                flex: 1,
-                minHeight: 0,
+                width: isMobile ? "100%" : "200px",
+                height: isMobile ? "140px" : "120px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                height: "100%",
-                width: "100%",
+                flexShrink: 0,
                 overflow: "hidden",
               }}
             >
@@ -371,6 +350,24 @@ export default function TimelineSection() {
                 </div>
               )}
             </div>
+
+            {/* Column 4: Note */}
+            <p
+              style={{
+                fontFamily: '"Courier New", monospace',
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "#888",
+                margin: 0,
+                width: isMobile ? "100%" : "180px",
+                textAlign: isMobile ? "left" : "right",
+                flexShrink: 0,
+              }}
+            >
+              ↳ {step.note}
+            </p>
           </div>
         ))}
       </div>
