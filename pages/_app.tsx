@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { WalletProvider } from '../contexts/WalletContext';
 import Loading from '../components/Loading';
+import CrabCursor from '../components/ui/CrabCursor';
 import '../styles/globals.css';
 
 let initialLoadPlayed = false;
@@ -25,6 +26,7 @@ export default function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <Component {...pageProps} />
+      <CrabCursor />
       {showLoading && <Loading onComplete={handleLoadingComplete} />}
     </WalletProvider>
   );
