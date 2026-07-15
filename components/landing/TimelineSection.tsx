@@ -9,6 +9,16 @@ import CoinsNote from "../ui/CoinsNote";
 // Register once at module level
 gsap.registerPlugin(ScrollTrigger);
 
+// ─── ICON SCALING CONFIGURATION ─────────────────────────────────────────────
+// Adjust these scale factors to resize the icons/animations manually
+// for Mobile (viewport <= 768px) and PC (viewport > 768px) independently.
+const ICON_SCALES = {
+  wallet: { mobile: 0.7, pc: 0.52 },
+  market: { mobile: 0.9, pc: 0.75 },
+  upDown: { mobile: 0.9, pc: 0.75 },
+  coins:  { mobile: 0.9, pc: 0.75 },
+};
+
 const STEPS = [
   {
     n: "01",
@@ -67,7 +77,7 @@ export default function TimelineSection() {
       /* ── Initial states ── */
       cards.forEach((card, i) => {
         const leftPos = isMobile ? "0%" : `${i * 25}%`;
-        const widthVal = isMobile ? "100%" : "25%";
+        const widthVal = isMobile ? "100%" : `${100 - i * 25}%`;
         gsap.set(card, {
           left: leftPos,
           width: widthVal,
@@ -199,7 +209,7 @@ export default function TimelineSection() {
               position: "absolute",
               top: i === 0 ? "0%" : "100%",
               left: isMobile ? "0%" : `${i * 25}%`,
-              width: isMobile ? "100%" : "25%",
+              width: isMobile ? "100%" : `${100 - i * 25}%`,
               height: "100%",
               background: "#FAF8F3",
               borderLeft: (!isMobile && i > 0) ? "1px solid #0D0B08" : "none",
@@ -207,154 +217,160 @@ export default function TimelineSection() {
               zIndex: i + 1,
               padding: isMobile ? "24px 20px" : "36px 24px",
               display: "flex",
-              flexDirection: "column",
-              gap: isMobile ? 12 : 16,
+              flexDirection: isMobile ? "column" : "row",
+              gap: isMobile ? 12 : 32,
               opacity: i === 0 ? 1 : 0,
               boxSizing: "border-box",
             }}
           >
-            {/* Step number + tag */}
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-              <span
+            {/* Left side: Text contents */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                width: isMobile ? "100%" : "280px",
+                flexShrink: 0,
+                height: isMobile ? "auto" : "100%",
+                gap: 16,
+              }}
+            >
+              {/* Step number + tag */}
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+                <span
+                  style={{
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    fontSize: isMobile ? 36 : 48,
+                    fontWeight: 900,
+                    lineHeight: 1,
+                    color: "#E8E5DF",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {step.n}
+                </span>
+                <span
+                  style={{
+                    fontFamily: '"Courier New", monospace',
+                    fontSize: 8,
+                    fontWeight: 700,
+                    letterSpacing: "0.22em",
+                    textTransform: "uppercase",
+                    color: "#C0392B",
+                  }}
+                >
+                  {step.tag}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h3
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
-                  fontSize: isMobile ? 36 : 48,
+                  fontSize: isMobile ? 18 : 22,
                   fontWeight: 900,
-                  lineHeight: 1,
-                  color: "#E8E5DF",
-                  letterSpacing: "-0.02em",
+                  lineHeight: 1.2,
+                  color: "#0D0B08",
+                  margin: 0,
                 }}
               >
-                {step.n}
-              </span>
-              <span
+                {step.title}
+              </h3>
+
+              {/* Thin rule */}
+              <div style={{ height: 1, background: "rgba(13,11,8,0.12)", flexShrink: 0 }} />
+
+              {/* Body */}
+              <p
+                style={{
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                  fontSize: 13,
+                  lineHeight: 1.75,
+                  color: "#5A5248",
+                  margin: 0,
+                  maxWidth: isMobile ? "100%" : 320,
+                }}
+              >
+                {step.body}
+              </p>
+
+              {/* Note */}
+              <p
                 style={{
                   fontFamily: '"Courier New", monospace',
-                  fontSize: 8,
+                  fontSize: 9,
                   fontWeight: 700,
-                  letterSpacing: "0.22em",
+                  letterSpacing: "0.14em",
                   textTransform: "uppercase",
-                  color: "#C0392B",
+                  color: "#888",
+                  margin: 0,
+                  marginTop: isMobile ? "8px" : "auto",
                 }}
               >
-                {step.tag}
-              </span>
+                ↳ {step.note}
+              </p>
             </div>
 
-            {/* Title */}
-            <h3
+            {/* Right side: Animation/Graphic Container */}
+            <div
               style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                fontSize: isMobile ? 18 : 22,
-                fontWeight: 900,
-                lineHeight: 1.2,
-                color: "#0D0B08",
-                margin: 0,
+                flex: 1,
+                minHeight: 0,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+                width: "100%",
+                overflow: "hidden",
               }}
             >
-              {step.title}
-            </h3>
-
-            {/* Thin rule */}
-            <div style={{ height: 1, background: "rgba(13,11,8,0.12)", flexShrink: 0 }} />
-
-            {/* Body */}
-            <p
-              style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                fontSize: 13,
-                lineHeight: 1.75,
-                color: "#5A5248",
-                margin: 0,
-                maxWidth: isMobile ? "100%" : 360,
-              }}
-            >
-              {step.body}
-            </p>
-
-            {/* Icons / Animations Container */}
-            {i === 0 && (
-              <div
-                style={{
-                  marginTop: "auto",
-                  marginBottom: "auto",
-                  transform: isMobile ? "scale(0.7)" : "scale(0.52)",
-                  transformOrigin: "center center",
-                  perspective: 1200,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <div className="wallet-anim-container" style={{ transformOrigin: "bottom center" }}>
-                  <WalletAnimation />
+              {i === 0 && (
+                <div
+                  style={{
+                    transform: isMobile ? `scale(${ICON_SCALES.wallet.mobile})` : `scale(${ICON_SCALES.wallet.pc})`,
+                    transformOrigin: "center center",
+                    perspective: 1200,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <div className="wallet-anim-container" style={{ transformOrigin: "bottom center" }}>
+                    <WalletAnimation />
+                  </div>
                 </div>
-              </div>
-            )}
-            {i === 1 && (
-              <div
-                style={{
-                  flex: 1,
-                  minHeight: 0,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  transform: isMobile ? "scale(0.9)" : "scale(0.75)",
-                  transformOrigin: "center center",
-                }}
-              >
-                <MarketSelector />
-              </div>
-            )}
-            {i === 2 && (
-              <div
-                style={{
-                  flex: 1,
-                  minHeight: 0,
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  transform: isMobile ? "scale(0.9)" : "scale(0.75)",
-                  transformOrigin: "center center",
-                }}
-              >
-                <UpnDown />
-              </div>
-            )}
-            {i === 3 && (
-              <div
-                style={{
-                  flex: 1,
-                  minHeight: 0,
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  transform: isMobile ? "scale(0.9)" : "scale(0.75)",
-                  transformOrigin: "center center",
-                }}
-              >
-                <CoinsNote />
-              </div>
-            )}
-
-            {/* Note */}
-            <p
-              style={{
-                fontFamily: '"Courier New", monospace',
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "#888",
-                margin: 0,
-                marginTop: "auto",
-              }}
-            >
-              ↳ {step.note}
-            </p>
+              )}
+              {i === 1 && (
+                <div
+                  style={{
+                    transform: isMobile ? `scale(${ICON_SCALES.market.mobile})` : `scale(${ICON_SCALES.market.pc})`,
+                    transformOrigin: "center center",
+                  }}
+                >
+                  <MarketSelector />
+                </div>
+              )}
+              {i === 2 && (
+                <div
+                  style={{
+                    transform: isMobile ? `scale(${ICON_SCALES.upDown.mobile})` : `scale(${ICON_SCALES.upDown.pc})`,
+                    transformOrigin: "center center",
+                  }}
+                >
+                  <UpnDown />
+                </div>
+              )}
+              {i === 3 && (
+                <div
+                  style={{
+                    transform: isMobile ? `scale(${ICON_SCALES.coins.mobile})` : `scale(${ICON_SCALES.coins.pc})`,
+                    transformOrigin: "center center",
+                  }}
+                >
+                  <CoinsNote />
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>
