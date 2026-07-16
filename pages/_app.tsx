@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import { Analytics } from '@vercel/analytics/react';
 import { WalletProvider } from '../contexts/WalletContext';
 import Loading from '../components/Loading';
 import CrabCursor from '../components/ui/CrabCursor';
@@ -26,6 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <Component {...pageProps} />
+      <Analytics />
       <CrabCursor />
       {showLoading && <Loading onComplete={handleLoadingComplete} />}
     </WalletProvider>
