@@ -21,7 +21,7 @@ const CW = 26; // candle body width
 
 function CandlestickChart() {
   return (
-    <svg width="15%" height="20%" viewBox="0 0 200 145" fill="none" style={{ marginLeft: "4%", overflow: "visible" }} xmlns="http://www.w3.org/2000/svg">
+    <svg width="220" height="160" viewBox="0 0 200 145" fill="none" style={{ marginLeft: "4%", overflow: "visible" }} xmlns="http://www.w3.org/2000/svg">
       {CANDLES.map((c, i) => (
         <g key={i} className={`candle-group candle-${c.color}`} style={{ animation: `candleFloat 2.8s ease-in-out ${c.delay} infinite`, cursor: 'pointer' }}>
           <line x1={c.cx} y1={c.bodyTop - c.topWick} x2={c.cx} y2={c.bodyTop}

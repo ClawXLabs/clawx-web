@@ -171,7 +171,7 @@ export default function UpnDown({ bottomRight }: UpnDownProps = {}) {
         style={{
           position: "relative",
           width: "100%",
-          maxWidth: "calc(25vw - 28px)",
+          maxWidth: "100%",
           height: "100%",
           display: "flex",
           alignItems: "center",
@@ -190,12 +190,12 @@ export default function UpnDown({ bottomRight }: UpnDownProps = {}) {
           <CandlestickChart />
         </div>
 
-        {/* ── Arrow Up — top-right of the visible area ── */}
+        {/* ── Arrow Up (Right Arrow) — top-right of the area ── */}
         <div
           style={{
             position: "absolute",
-            top:   "clamp(30px, 4%, 12px)",
-            right: "clamp(44px, 2%, 12px)",
+            top:   "10%",
+            right: "15%",
             width:  "clamp(31px, 5.2vw, 85px)",
             height: "clamp(44px, 9.8vw, 220px)",
             pointerEvents: "none",
@@ -204,13 +204,13 @@ export default function UpnDown({ bottomRight }: UpnDownProps = {}) {
           <ArrowUp />
         </div>
 
-        {/* ── Arrow Down — bottom-left of the visible area ── */}
+        {/* ── Arrow Down (Left Arrow) — bottom-left of the area ── */}
         <div
           style={{
             scale: 1,
             position: "absolute",
-            bottom: "clamp(2px, 8%, 12px)",
-            left:   "clamp(2px, 6%, 32px)",
+            bottom: "10%",
+            left:   "15%",
             width:  "clamp(31px, 5.2vw, 85px)",
             height: "clamp(44px, 9.8vw, 220px)",
             pointerEvents: "none",
