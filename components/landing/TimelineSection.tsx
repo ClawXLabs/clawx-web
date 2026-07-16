@@ -296,17 +296,20 @@ export default function TimelineSection() {
             {i === 0 && (
               <div
                 style={{
-                  marginTop: "auto",
-                  marginBottom: isMobile ? "auto" : "0px",
-                  transform: isMobile ? `scale(${ICON_SCALES.wallet.mobile})` : `scale(${ICON_SCALES.wallet.pc})`,
-                  transformOrigin: "left top",
+                  position: isMobile ? "relative" : "absolute",
+                  left: isMobile ? "0px" : "15%",
+                  top: isMobile ? "auto" : "50%",
+                  transform: isMobile ? `scale(${ICON_SCALES.wallet.mobile})` : `translateY(-50%) scale(${ICON_SCALES.wallet.pc})`,
+                  transformOrigin: isMobile ? "center center" : "left center",
                   perspective: 1200,
                   display: "flex",
-                  justifyContent: "flex-start",
-                  width: "100%",
+                  justifyContent: isMobile ? "center" : "flex-start",
+                  width: isMobile ? "100%" : "auto",
+                  marginTop: isMobile ? "auto" : "0px",
+                  marginBottom: isMobile ? "auto" : "0px",
                 }}
               >
-                <div className="wallet-anim-container" style={{ transformOrigin: "left bottom" }}>
+                <div className="wallet-anim-container" style={{ transformOrigin: isMobile ? "center center" : "left center" }}>
                   <WalletAnimation />
                 </div>
               </div>
@@ -314,66 +317,52 @@ export default function TimelineSection() {
             {i === 1 && (
               <div
                 style={{
-                  flex: 1,
-                  minHeight: 0,
+                  position: isMobile ? "relative" : "absolute",
+                  left: isMobile ? "0px" : "15%",
+                  top: isMobile ? "auto" : "50%",
+                  transform: isMobile ? `scale(${ICON_SCALES.market.mobile})` : `translateY(-50%) scale(${ICON_SCALES.market.pc})`,
+                  transformOrigin: isMobile ? "center center" : "left center",
                   display: "flex",
-                  justifyContent: "flex-start",
+                  justifyContent: isMobile ? "center" : "flex-start",
                   alignItems: "center",
-                  paddingLeft: "0px",
+                  width: isMobile ? "100%" : "auto",
                 }}
               >
-                <div
-                  style={{
-                    transform: isMobile ? `scale(${ICON_SCALES.market.mobile})` : `scale(${ICON_SCALES.market.pc})`,
-                    transformOrigin: "left center",
-                  }}
-                >
-                  <MarketSelector />
-                </div>
+                <MarketSelector />
               </div>
             )}
             {i === 2 && (
               <div
                 style={{
-                  flex: 1,
-                  minHeight: 0,
-                  width: "100%",
+                  position: isMobile ? "relative" : "absolute",
+                  left: isMobile ? "0px" : "15%",
+                  top: isMobile ? "auto" : "50%",
+                  transform: isMobile ? `scale(${ICON_SCALES.upDown.mobile})` : `translateY(-50%) scale(${ICON_SCALES.upDown.pc})`,
+                  transformOrigin: isMobile ? "center center" : "left center",
                   display: "flex",
-                  justifyContent: "flex-start",
+                  justifyContent: isMobile ? "center" : "flex-start",
                   alignItems: "center",
-                  paddingLeft: "0px",
+                  width: isMobile ? "100%" : "auto",
                 }}
               >
-                <div
-                  style={{
-                    transform: isMobile ? `scale(${ICON_SCALES.upDown.mobile})` : `scale(${ICON_SCALES.upDown.pc})`,
-                    transformOrigin: "left center",
-                  }}
-                >
-                  <UpnDown />
-                </div>
+                <UpnDown />
               </div>
             )}
             {i === 3 && (
               <div
                 style={{
-                  flex: 1,
-                  minHeight: 0,
-                  width: "100%",
+                  position: isMobile ? "relative" : "absolute",
+                  left: isMobile ? "0px" : "15%",
+                  top: isMobile ? "auto" : "50%",
+                  transform: isMobile ? `scale(${ICON_SCALES.coins.mobile})` : `translateY(-50%) scale(${ICON_SCALES.coins.pc})`,
+                  transformOrigin: isMobile ? "center center" : "left center",
                   display: "flex",
-                  justifyContent: "flex-start",
+                  justifyContent: isMobile ? "center" : "flex-start",
                   alignItems: "center",
-                  paddingLeft: "0px",
+                  width: isMobile ? "100%" : "auto",
                 }}
               >
-                <div
-                  style={{
-                    transform: isMobile ? `scale(${ICON_SCALES.coins.mobile})` : `scale(${ICON_SCALES.coins.pc})`,
-                    transformOrigin: "left center",
-                  }}
-                >
-                  <CoinsNote />
-                </div>
+                <CoinsNote />
               </div>
             )}
 
