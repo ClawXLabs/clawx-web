@@ -364,7 +364,7 @@ export default function TimelineSection() {
                   justifyContent: isMobile ? "center" : "flex-start",
                   alignItems: "center",
                   width: isMobile ? "100%" : "auto",
-                  marginTop: isMobile ? "120px" : "0px",
+                  marginTop: isMobile ? "280px" : "0px",
                   marginBottom: isMobile ? "120px" : "0px",
                 }}
               >
