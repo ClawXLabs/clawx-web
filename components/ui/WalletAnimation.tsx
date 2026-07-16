@@ -90,8 +90,8 @@ export default function WalletAnimation() {
             width: BASE_WIDTH,
             height: BASE_HEIGHT,
             cursor: "pointer",
-            marginTop: 80,
-            marginBottom: 40,
+            marginTop: 0,
+            marginBottom: 0,
             transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
             transform: hovered ? "scale(1.05)" : "scale(1)",
           }}
