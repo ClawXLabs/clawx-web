@@ -194,8 +194,8 @@ export default function UpnDown({ bottomRight }: UpnDownProps = {}) {
         <div
           style={{
             position: "absolute",
-            top:   "10%",
-            right: "15%",
+            top:   "-15%",
+            right: "0%",
             width:  "clamp(31px, 5.2vw, 85px)",
             height: "clamp(44px, 9.8vw, 220px)",
             pointerEvents: "none",
@@ -209,8 +209,8 @@ export default function UpnDown({ bottomRight }: UpnDownProps = {}) {
           style={{
             scale: 1,
             position: "absolute",
-            bottom: "10%",
-            left:   "15%",
+            bottom: "-30%",
+            left:   "0%",
             width:  "clamp(31px, 5.2vw, 85px)",
             height: "clamp(44px, 9.8vw, 220px)",
             pointerEvents: "none",
