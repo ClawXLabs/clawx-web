@@ -4,8 +4,8 @@ import React from "react";
 const CANDLES = [
 //   { cx: 20,  bodyTop: 28, bodyH: 80,  topWick: 20, botWick: 18, delay: "0s",    color: "red"   },
 //   { cx: 58,  bodyTop: 10, bodyH: 100, topWick: 18, botWick: 20, delay: "0.35s", color: "green" },
-  { cx: 56,  bodyTop: 22, bodyH: 50,  topWick: 32, botWick: 26, delay: "0s",  color: "red"   },
-  { cx: 104, bodyTop: 8,  bodyH: 128,  topWick: 30, botWick: 22, delay: "0.3s",  color: "green" },
+  { cx: 75,  bodyTop: 22, bodyH: 50,  topWick: 32, botWick: 26, delay: "0s",  color: "red"   },
+  { cx: 125, bodyTop: 8,  bodyH: 128,  topWick: 30, botWick: 22, delay: "0.3s",  color: "green" },
 //   { cx: 172, bodyTop: 18, bodyH: 78,  topWick: 16, botWick: 20, delay: "0.5s",  color: "green" },
 ];
 const CW = 28; // candle body width
