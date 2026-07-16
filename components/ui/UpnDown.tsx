@@ -196,8 +196,8 @@ export default function UpnDown({ bottomRight }: UpnDownProps = {}) {
             position: "absolute",
             top:   "-15%",
             right: "0%",
-            width:  "clamp(31px, 5.2vw, 85px)",
-            height: "clamp(44px, 9.8vw, 220px)",
+            width:  "clamp(60px, 10vw, 85px)",
+            height: "clamp(80px, 14vw, 120px)",
             pointerEvents: "none",
           }}
         >
@@ -211,8 +211,8 @@ export default function UpnDown({ bottomRight }: UpnDownProps = {}) {
             position: "absolute",
             bottom: "-30%",
             left:   "0%",
-            width:  "clamp(31px, 5.2vw, 85px)",
-            height: "clamp(44px, 9.8vw, 220px)",
+            width:  "clamp(60px, 10vw, 85px)",
+            height: "clamp(80px, 14vw, 120px)",
             pointerEvents: "none",
           }}
         >
