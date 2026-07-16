@@ -297,7 +297,7 @@ export default function TimelineSection() {
               <div
                 style={{
                   position: isMobile ? "relative" : "absolute",
-                  left: isMobile ? "0px" : "10%",
+                  left: isMobile ? "0px" : "5%",
                   top: isMobile ? "auto" : "50%",
                   transform: isMobile ? `scale(${ICON_SCALES.wallet.mobile})` : `translateY(-50%) scale(${ICON_SCALES.wallet.pc})`,
                   transformOrigin: isMobile ? "center center" : "left center",
@@ -318,7 +318,7 @@ export default function TimelineSection() {
               <div
                 style={{
                   position: isMobile ? "relative" : "absolute",
-                  left: isMobile ? "0px" : "10%",
+                  left: isMobile ? "0px" : "5%",
                   top: isMobile ? "auto" : "50%",
                   transform: isMobile ? `scale(${ICON_SCALES.market.mobile})` : `translateY(-50%) scale(${ICON_SCALES.market.pc})`,
                   transformOrigin: isMobile ? "center center" : "left center",
@@ -335,7 +335,7 @@ export default function TimelineSection() {
               <div
                 style={{
                   position: isMobile ? "relative" : "absolute",
-                  left: isMobile ? "0px" : "10%",
+                  left: isMobile ? "0px" : "5%",
                   top: isMobile ? "auto" : "50%",
                   transform: isMobile ? `scale(${ICON_SCALES.upDown.mobile})` : `translateY(-50%) scale(${ICON_SCALES.upDown.pc})`,
                   transformOrigin: isMobile ? "center center" : "left center",
@@ -352,7 +352,7 @@ export default function TimelineSection() {
               <div
                 style={{
                   position: isMobile ? "relative" : "absolute",
-                  left: isMobile ? "0px" : "10%",
+                  left: isMobile ? "0px" : "5%",
                   top: isMobile ? "auto" : "50%",
                   transform: isMobile ? `scale(${ICON_SCALES.coins.mobile})` : `translateY(-50%) scale(${ICON_SCALES.coins.pc})`,
                   transformOrigin: isMobile ? "center center" : "left center",

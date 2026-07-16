@@ -14,7 +14,7 @@ interface Card {
 const CARDS: Card[] = [
   {
     id: 'agent',
-    kicker: '◆ MODE B',
+    kicker: '◆ MODE A',
     headline: 'Deploy an Agent',
     body: 'Delegate trading to one of the on-chain AI agents. Approve a TUSDC allowance once, and the agent executes positions autonomously on your behalf based on its encoded strategy.',
     cta: { label: 'VIEW AGENTS', href: '/agents' },
@@ -23,7 +23,7 @@ const CARDS: Card[] = [
   },
   {
     id: 'human',
-    kicker: '◆ MODE A',
+    kicker: '◆ MODE B',
     headline: 'Trade Manually',
     body: 'Connect your wallet, pick BTC, ETH, or AVAX, and lock a UP or DOWN position before the 5-minute window closes. Chainlink oracle settles the outcome. Winners claim proportional pool rewards.',
     cta: { label: 'GO TO MARKETS', href: '/markets' },
@@ -82,6 +82,13 @@ export default function RoleCards() {
         borderBottom: '3px solid #0D0B08',
       }}
     >
+      <style>{`
+        @keyframes pulseGlow {
+          0%, 100% { opacity: 0.4; transform: scale(0.9); }
+          50%      { opacity: 1; transform: scale(1.15); }
+        }
+      `}</style>
+
       {/* Section header rule */}
       <div
         style={{
@@ -122,11 +129,13 @@ export default function RoleCards() {
               color: '#0D0B08',
               borderRight: (!isMobile && i === 0) ? '1px solid #0D0B08' : 'none',
               borderBottom: (isMobile && i === 0) ? '1px solid #0D0B08' : 'none',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             <div
               style={{
-                width: '100%',
+                width: 'auto',
                 minWidth: isMobile ? '0px' : '400px',
                 padding: isMobile ? '36px 24px' : '48px 40px',
                 display: 'flex',
@@ -134,22 +143,65 @@ export default function RoleCards() {
                 gap: 24,
                 boxSizing: 'border-box',
                 height: '100%',
+                flex: 1,
+                position: 'relative',
+                border: card.id === 'agent' ? '2.5px solid #E74141' : 'none',
+                margin: card.id === 'agent' ? '12px' : '0px',
+                background: card.id === 'agent' ? 'rgba(231, 65, 65, 0.02)' : 'transparent',
               }}
             >
-              {/* Kicker */}
-              <p
-                style={{
-                  fontFamily: '"Courier New", monospace',
-                  fontSize: 9,
-                  fontWeight: 700,
-                  letterSpacing: '0.24em',
-                  textTransform: 'uppercase',
-                  color: '#0D0B08',
-                  margin: 0,
-                }}
-              >
-                {card.kicker}
-              </p>
+              {/* HUD techy brackets for Agent card */}
+              {card.id === 'agent' && (
+                <>
+                  <div style={{ position: 'absolute', top: 8, left: 8, width: 10, height: 10, borderTop: '2px solid #E74141', borderLeft: '2px solid #E74141', pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', top: 8, right: 8, width: 10, height: 10, borderTop: '2px solid #E74141', borderRight: '2px solid #E74141', pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', bottom: 8, left: 8, width: 10, height: 10, borderBottom: '2px solid #E74141', borderLeft: '2px solid #E74141', pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', bottom: 8, right: 8, width: 10, height: 10, borderBottom: '2px solid #E74141', borderRight: '2px solid #E74141', pointerEvents: 'none' }} />
+                </>
+              )}
+
+              {/* Kicker Header row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <p
+                  style={{
+                    fontFamily: '"Courier New", monospace',
+                    fontSize: 9,
+                    fontWeight: 700,
+                    letterSpacing: '0.24em',
+                    textTransform: 'uppercase',
+                    color: '#0D0B08',
+                    margin: 0,
+                  }}
+                >
+                  {card.kicker}
+                </p>
+                {card.id === 'agent' && (
+                  <span style={{
+                    fontFamily: '"Courier New", monospace',
+                    fontSize: 8,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    color: '#E74141',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    background: 'rgba(231, 65, 65, 0.08)',
+                    border: '1.5px solid #E74141',
+                    padding: '2px 8px',
+                    borderRadius: 4,
+                  }}>
+                    <span style={{
+                      width: 5,
+                      height: 5,
+                      borderRadius: '50%',
+                      background: '#E74141',
+                      display: 'inline-block',
+                      animation: 'pulseGlow 1.8s infinite',
+                    }} />
+                    MODULE_ACTIVE
+                  </span>
+                )}
+              </div>
 
               {/* Headline */}
               <h2
@@ -171,7 +223,7 @@ export default function RoleCards() {
               <div
                 style={{
                   height: 1,
-                  background: 'rgba(13, 11, 8, 0.15)',
+                  background: card.id === 'agent' ? 'rgba(231, 65, 65, 0.25)' : 'rgba(13, 11, 8, 0.15)',
                   flexShrink: 0,
                 }}
               />
@@ -209,14 +261,14 @@ export default function RoleCards() {
                       fontWeight: 700,
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
-                      color: 'rgba(13, 11, 8, 0.6)',
+                      color: card.id === 'agent' ? '#C0392B' : 'rgba(13, 11, 8, 0.6)',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 8,
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    <span style={{ color: '#0D0B08', fontSize: 12 }}>—</span> {f}
+                    <span style={{ color: card.id === 'agent' ? '#E74141' : '#0D0B08', fontSize: 12 }}>—</span> {f}
                   </li>
                 ))}
               </ul>
