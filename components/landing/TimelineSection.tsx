@@ -326,6 +326,8 @@ export default function TimelineSection() {
                   justifyContent: isMobile ? "center" : "flex-start",
                   alignItems: "center",
                   width: isMobile ? "100%" : "auto",
+                  marginTop: isMobile ? "auto" : "0px",
+                  marginBottom: isMobile ? "auto" : "0px",
                 }}
               >
                 <MarketSelector />
@@ -343,6 +345,8 @@ export default function TimelineSection() {
                   justifyContent: isMobile ? "center" : "flex-start",
                   alignItems: "center",
                   width: isMobile ? "100%" : "auto",
+                  marginTop: isMobile ? "auto" : "0px",
+                  marginBottom: isMobile ? "auto" : "0px",
                 }}
               >
                 <UpnDown />
@@ -360,6 +364,8 @@ export default function TimelineSection() {
                   justifyContent: isMobile ? "center" : "flex-start",
                   alignItems: "center",
                   width: isMobile ? "100%" : "auto",
+                  marginTop: isMobile ? "auto" : "0px",
+                  marginBottom: isMobile ? "auto" : "0px",
                 }}
               >
                 <CoinsNote />
