@@ -16,7 +16,7 @@ const ICON_SCALES = {
   wallet: { mobile: 0.6, pc: 0.55 },
   market: { mobile: 0.8, pc: 0.75 },
   upDown: { mobile: 0.8, pc: 0.75 },
-  coins:  { mobile: 2.4, pc: 0.75 },
+  coins:  { mobile: 5.4, pc: 0.75 },
 };
 
 const REST_POSITIONS = [0, 0.25, 0.5, 0.75];
@@ -364,8 +364,8 @@ export default function TimelineSection() {
                   justifyContent: isMobile ? "center" : "flex-start",
                   alignItems: "center",
                   width: isMobile ? "100%" : "auto",
-                  marginTop: isMobile ? "auto" : "0px",
-                  marginBottom: isMobile ? "auto" : "0px",
+                  marginTop: isMobile ? "120px" : "0px",
+                  marginBottom: isMobile ? "120px" : "0px",
                 }}
               >
                 <CoinsNote />
