@@ -299,14 +299,14 @@ export default function TimelineSection() {
                   marginTop: "auto",
                   marginBottom: isMobile ? "auto" : "0px",
                   transform: isMobile ? `scale(${ICON_SCALES.wallet.mobile})` : `scale(${ICON_SCALES.wallet.pc})`,
-                  transformOrigin: isMobile ? "center center" : "left top",
+                  transformOrigin: "left top",
                   perspective: 1200,
                   display: "flex",
-                  justifyContent: isMobile ? "center" : "flex-start",
+                  justifyContent: "flex-start",
                   width: "100%",
                 }}
               >
-                <div className="wallet-anim-container" style={{ transformOrigin: "bottom center" }}>
+                <div className="wallet-anim-container" style={{ transformOrigin: "left bottom" }}>
                   <WalletAnimation />
                 </div>
               </div>
@@ -317,15 +317,15 @@ export default function TimelineSection() {
                   flex: 1,
                   minHeight: 0,
                   display: "flex",
-                  justifyContent: isMobile ? "center" : "flex-start",
+                  justifyContent: "flex-start",
                   alignItems: "center",
-                  paddingLeft: isMobile ? "0px" : "15%",
+                  paddingLeft: "0px",
                 }}
               >
                 <div
                   style={{
                     transform: isMobile ? `scale(${ICON_SCALES.market.mobile})` : `scale(${ICON_SCALES.market.pc})`,
-                    transformOrigin: isMobile ? "center center" : "left center",
+                    transformOrigin: "left center",
                   }}
                 >
                   <MarketSelector />
@@ -339,15 +339,15 @@ export default function TimelineSection() {
                   minHeight: 0,
                   width: "100%",
                   display: "flex",
-                  justifyContent: isMobile ? "center" : "flex-start",
+                  justifyContent: "flex-start",
                   alignItems: "center",
-                  paddingLeft: isMobile ? "0px" : "15%",
+                  paddingLeft: "0px",
                 }}
               >
                 <div
                   style={{
                     transform: isMobile ? `scale(${ICON_SCALES.upDown.mobile})` : `scale(${ICON_SCALES.upDown.pc})`,
-                    transformOrigin: isMobile ? "center center" : "left center",
+                    transformOrigin: "left center",
                   }}
                 >
                   <UpnDown />
@@ -361,15 +361,15 @@ export default function TimelineSection() {
                   minHeight: 0,
                   width: "100%",
                   display: "flex",
-                  justifyContent: isMobile ? "center" : "flex-start",
+                  justifyContent: "flex-start",
                   alignItems: "center",
-                  paddingLeft: isMobile ? "0px" : "15%",
+                  paddingLeft: "0px",
                 }}
               >
                 <div
                   style={{
                     transform: isMobile ? `scale(${ICON_SCALES.coins.mobile})` : `scale(${ICON_SCALES.coins.pc})`,
-                    transformOrigin: isMobile ? "center center" : "left center",
+                    transformOrigin: "left center",
                   }}
                 >
                   <CoinsNote />
