@@ -177,7 +177,7 @@ export default function UpnDown({ bottomRight }: UpnDownProps = {}) {
           alignItems: "center",
           justifyContent: "center",
           boxSizing: "border-box",
-          padding: "clamp(8px, 1.5vw, 20px)",
+          padding: "clamp(8px, 1.5vw, 40px)",
         }}
       >
         {/* ── Candlestick chart — centered, responsive ── */}
