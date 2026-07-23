@@ -33,50 +33,7 @@ interface Asset {
   bull: boolean;
 }
 
-// ─── Edit stat hover colors here ───────────────────────────────────────────
-const STATS: Stat[] = [
-  {
-    label: 'AI Agents Enrolled',
-    value: '4',
-    hoverBg: '#F69D39',
-    hoverColor: '#FAF8F3',
-    IconComponent: RoboAgent,
-
-  },
-  {
-    label: 'Rounds Settled',
-    value: '0',
-    hoverBg: '#C0392B',
-    hoverColor: '#FAF8F3',
-    IconComponent: SettledRounds,
-    iconStyle: {
-      right: '16px',
-      bottom: '12px',
-      width: '170px',
-      height: '170px',
-    },
-  },
-  {
-    label: 'Simulated Volume',
-    value: '$0.00M',
-    hoverBg: '#27AE60',
-    hoverColor: '#FAF8F3',
-    IconComponent: Volumes,
-  },
-  {
-    label: 'Avg Round Length',
-    value: '5 MIN',
-    hoverBg: '#1A6EA8',
-    hoverColor: '#FAF8F3',
-    IconComponent: FiveMinTimer,
-    iconStyle: {
-      right: '-50px',
-      bottom: '-80px',
-      width: '320px',
-      height: '320px',
-    },
-  },
-];
+// STATS has been moved inside HeroSection to allow dynamic rendering of API data.
 
 // ─── Edit asset strip data here ────────────────────────────────────────────
 const ASSETS: Asset[] = [
@@ -250,6 +207,11 @@ function AssetCell({ asset, index }: { asset: Asset; index: number }) {
 // ─── Hero Section ───────────────────────────────────────────────────────────
 export default function HeroSection({ account, onConnect, onLaunchClick }: HeroSectionProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const [statsData, setStatsData] = useState({
+    activeAgents: 18,
+    totalTransactions: 13614,
+    totalVolumeTusdc: 112915,
+  });
 
   useEffect(() => {
     const handleResize = () => {
@@ -259,6 +221,78 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    fetch('https://app.clawxlab.xyz/api/v1/stats')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.ok && data.stats) {
+          setStatsData({
+            activeAgents: data.stats.activeAgents || data.stats.enrolledWallets || 18,
+            totalTransactions: data.stats.totalTransactions || 13614,
+            totalVolumeTusdc: data.stats.totalVolumeTusdc || 112915,
+          });
+        }
+      })
+      .catch((err) => console.error('Error fetching stats:', err));
+  }, []);
+
+  const formatVolume = (val: number) => {
+    if (val >= 1000000) {
+      return `$${(val / 1000000).toFixed(2)}M`;
+    }
+    if (val >= 1000) {
+      return `$${(val / 1000).toFixed(1)}K`;
+    }
+    return `$${val}`;
+  };
+
+  const formatNumber = (val: number) => {
+    return val.toLocaleString();
+  };
+
+  const stats: Stat[] = [
+    {
+      label: 'AI Agents Enrolled',
+      value: formatNumber(statsData.activeAgents),
+      hoverBg: '#F69D39',
+      hoverColor: '#FAF8F3',
+      IconComponent: RoboAgent,
+    },
+    {
+      label: 'Rounds Settled',
+      value: formatNumber(statsData.totalTransactions),
+      hoverBg: '#C0392B',
+      hoverColor: '#FAF8F3',
+      IconComponent: SettledRounds,
+      iconStyle: {
+        right: '16px',
+        bottom: '8px',
+        width: '170px',
+        height: '170px',
+      },
+    },
+    {
+      label: 'Simulated Volume',
+      value: formatVolume(statsData.totalVolumeTusdc),
+      hoverBg: '#27AE60',
+      hoverColor: '#FAF8F3',
+      IconComponent: Volumes,
+    },
+    {
+      label: 'Avg Round Length',
+      value: '5 MIN',
+      hoverBg: '#1A6EA8',
+      hoverColor: '#FAF8F3',
+      IconComponent: FiveMinTimer,
+      iconStyle: {
+        right: '-50px',
+        bottom: '-80px',
+        width: '320px',
+        height: '320px',
+      },
+    },
+  ];
 
   return (
     <section
@@ -442,7 +476,7 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
             // background: 'transparent',
           }}
         >
-          {STATS.map((stat, i) => (
+          {stats.map((stat, i) => (
             <StatCell key={stat.label} stat={stat} index={i} isMobile={isMobile} />
           ))}
         </div>
