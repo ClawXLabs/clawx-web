@@ -31,7 +31,14 @@ export default function WeighingScale({
       viewBox="0 0 654 450"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ maxWidth: "100%", height: "auto", overflow: "visible", ...style }}
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "block",
+        overflow: "visible",
+        ...style,
+      }}
+      preserveAspectRatio="xMidYMax meet"
     >
       {/* STATIC: Central pillar / stand */}
       <path
