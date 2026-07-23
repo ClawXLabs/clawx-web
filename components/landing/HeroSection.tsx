@@ -48,6 +48,7 @@ function StatCell({ stat, index, isMobile }: { stat: Stat; index: number; isMobi
 
   const isRightCol = index % 2 !== 0;
   const isBottomRow = index >= 2;
+  const flushBottom = stat.label === 'Rounds Settled';
 
   // Define responsive icon styles
   let responsiveIconStyle: React.CSSProperties = {};
@@ -61,17 +62,17 @@ function StatCell({ stat, index, isMobile }: { stat: Stat; index: number; isMobi
       };
     } else if (stat.label === 'Rounds Settled') {
       responsiveIconStyle = {
-        width: '110px',
-        height: '110px',
-        right: '10px',
-        bottom: '8px',
+        width: '120px',
+        height: '120px',
+        right: '8px',
+        bottom: '0px',
       };
     } else if (stat.label === 'Simulated Volume') {
       responsiveIconStyle = {
-        width: '130px',
-        height: '130px',
-        right: '-10px',
-        bottom: '0px',
+        width: '180px',
+        height: '110px',
+        right: '-4px',
+        bottom: '4px',
       };
     } else if (stat.label === 'Avg Round Length') {
       responsiveIconStyle = {
@@ -108,12 +109,15 @@ function StatCell({ stat, index, isMobile }: { stat: Stat; index: number; isMobi
           height: '210px',
           opacity: isMobile ? 0.6 : (hovered ? 0.9 : 0),
           transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          transform: hovered ? 'scale(1.05) translate(0, 0)' : 'scale(0.98) translate(20px, 20px)',
+          transform: flushBottom
+            ? (hovered ? 'scale(1.04)' : 'scale(1)')
+            : (hovered ? 'scale(1.05) translate(0, 0)' : 'scale(0.98) translate(20px, 20px)'),
+          transformOrigin: flushBottom ? 'bottom right' : 'center center',
           pointerEvents: hovered ? 'auto' : 'none',
           zIndex: 0,
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          alignItems: flushBottom ? 'flex-end' : 'center',
+          justifyContent: flushBottom ? 'flex-end' : 'center',
           filter: 'invert(1)',
           mixBlendMode: 'screen',
           ...stat.iconStyle,
@@ -266,10 +270,10 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
       hoverColor: '#FAF8F3',
       IconComponent: SettledRounds,
       iconStyle: {
-        right: '16px',
-        bottom: '8px',
-        width: '170px',
-        height: '170px',
+        right: '12px',
+        bottom: '0px',
+        width: '180px',
+        height: '180px',
       },
     },
     {
@@ -278,6 +282,12 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
       hoverBg: '#27AE60',
       hoverColor: '#FAF8F3',
       IconComponent: Volumes,
+      iconStyle: {
+        right: '-4px',
+        bottom: '8px',
+        width: '280px',
+        height: '180px',
+      },
     },
     {
       label: 'Avg Round Length',

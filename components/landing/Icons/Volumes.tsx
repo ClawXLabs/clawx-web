@@ -1,29 +1,103 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-interface PupilPos {
-  x: number;
-  y: number;
+interface Candle {
+  open: number;
+  close: number;
+  high: number;
+  low: number;
+  bull: boolean;
 }
 
-const EYE_LEFT = { cx: 120, cy: 207.254, r: 14 };
-const EYE_RIGHT = { cx: 229, cy: 207.254, r: 14 };
+const VIEW_W = 480;
+const VIEW_H = 280;
+const CANDLE_W = 20;
+const CANDLE_GAP = 10;
+const STRIDE = CANDLE_W + CANDLE_GAP;
+/** Room for stroke + round wick caps so nothing clips. */
+const PAD_Y = 18;
+/** Exact integer wave cycles so the duplicated strip seams perfectly. */
+const WAVE_CYCLES = 2;
+const COUNT = 24;
 
-function clampPupil(
-  mouseX: number,
-  mouseY: number,
-  eye: { cx: number; cy: number; r: number }
-): { x: number; y: number } {
-  const dx = mouseX - eye.cx;
-  const dy = mouseY - eye.cy;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-  if (dist <= eye.r) return { x: mouseX, y: mouseY };
-  return {
-    x: eye.cx + (dx / dist) * eye.r,
-    y: eye.cy + (dy / dist) * eye.r,
-  };
+function buildWaveCandles(count: number): Candle[] {
+  const midY = VIEW_H / 2;
+  const amp = VIEW_H * 0.22;
+  const raw: Omit<Candle, never>[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const t = i / count;
+    const angle = t * Math.PI * 2 * WAVE_CYCLES;
+    const wave =
+      Math.sin(angle) * amp +
+      Math.sin(angle * 2) * amp * 0.2;
+    const center = midY - wave;
+
+    const bodyH = 20 + Math.abs(Math.sin(angle * 1.5)) * 36;
+    const wickExtra = 10 + Math.abs(Math.cos(angle * 1.25)) * 14;
+    const bull = Math.sin(angle + 0.4) >= 0;
+
+    const open = bull ? center + bodyH / 2 : center - bodyH / 2;
+    const close = bull ? center - bodyH / 2 : center + bodyH / 2;
+    const high = Math.min(open, close) - wickExtra;
+    const low = Math.max(open, close) + wickExtra * 0.8;
+
+    raw.push({ open, close, high, low, bull });
+  }
+
+  // Fit entire series into the viewBox with padding — no hard per-candle crop
+  let minY = Infinity;
+  let maxY = -Infinity;
+  for (const c of raw) {
+    minY = Math.min(minY, c.high);
+    maxY = Math.max(maxY, c.low);
+  }
+
+  const usable = VIEW_H - PAD_Y * 2;
+  const span = Math.max(1, maxY - minY);
+  const scale = usable / span;
+
+  return raw.map((c) => ({
+    open: PAD_Y + (c.open - minY) * scale,
+    close: PAD_Y + (c.close - minY) * scale,
+    high: PAD_Y + (c.high - minY) * scale,
+    low: PAD_Y + (c.low - minY) * scale,
+    bull: c.bull,
+  }));
 }
 
-export default function RobotAgent({
+function CandleStick({ candle, x }: { candle: Candle; x: number }) {
+  const top = Math.min(candle.open, candle.close);
+  const bottom = Math.max(candle.open, candle.close);
+  const bodyH = Math.max(4, bottom - top);
+  const cx = x + CANDLE_W / 2;
+
+  return (
+    <g>
+      <line
+        x1={cx}
+        y1={candle.high}
+        x2={cx}
+        y2={candle.low}
+        stroke="black"
+        strokeWidth={2}
+        strokeLinecap="round"
+      />
+      {/* Solid bull / outlined bear — survives invert + screen blend */}
+      <rect
+        x={x}
+        y={top}
+        width={CANDLE_W}
+        height={bodyH}
+        rx={1}
+        fill={candle.bull ? "black" : "none"}
+        stroke="black"
+        strokeWidth={2}
+      />
+    </g>
+  );
+}
+
+export default function Volumes({
   width = "100%",
   height = "100%",
   style,
@@ -34,159 +108,65 @@ export default function RobotAgent({
   style?: React.CSSProperties;
   hovered?: boolean;
 }) {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [pupilL, setPupilL] = useState<PupilPos>({ x: EYE_LEFT.cx, y: EYE_LEFT.cy });
-  const [pupilR, setPupilR] = useState<PupilPos>({ x: EYE_RIGHT.cx, y: EYE_RIGHT.cy });
-  const [antRotL, setAntRotL] = useState(0);
-  const [antRotR, setAntRotR] = useState(0);
   const [localHovered, setLocalHovered] = useState(false);
-  const rafRef = useRef<number>(0);
-  const tRef = useRef(0);
-
   const isHovered = parentHovered || localHovered;
 
-  // Antenna sway animation
+  const stripRef = useRef<SVGGElement>(null);
+  const offsetRef = useRef(0);
+  const rafRef = useRef(0);
+
+  const candles = useMemo(() => buildWaveCandles(COUNT), []);
+  const strip = useMemo(
+    () => [...candles, ...candles, ...candles],
+    [candles]
+  );
+  const loopWidth = COUNT * STRIDE;
+
   useEffect(() => {
-    const animate = () => {
-      tRef.current += 0.018;
-      const t = tRef.current;
-      const boost = isHovered ? 2.5 : 1;
-      setAntRotL(Math.sin(t) * 4 * boost);
-      setAntRotR(Math.sin(t + Math.PI * 0.6) * 4 * boost);
-      rafRef.current = requestAnimationFrame(animate);
+    const apply = (x: number) => {
+      if (stripRef.current) {
+        stripRef.current.setAttribute("transform", `translate(${x} 0)`);
+      }
     };
-    rafRef.current = requestAnimationFrame(animate);
+
+    const speed = isHovered ? 1.4 : 0.7;
+
+    const tick = () => {
+      offsetRef.current += speed;
+      if (offsetRef.current >= loopWidth) {
+        offsetRef.current -= loopWidth;
+      }
+      apply(offsetRef.current - loopWidth);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isHovered]);
-
-  // Mouse tracking
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const svg = svgRef.current;
-      if (!svg) return;
-      const rect = svg.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-      const scaleX = 349 / rect.width;
-      const scaleY = 517 / rect.height;
-      const mx = (e.clientX - rect.left) * scaleX;
-      const my = (e.clientY - rect.top) * scaleY;
-      setPupilL(clampPupil(mx, my, EYE_LEFT));
-      setPupilR(clampPupil(mx, my, EYE_RIGHT));
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  const resetPupils = () => {
-    setPupilL({ x: EYE_LEFT.cx, y: EYE_LEFT.cy });
-    setPupilR({ x: EYE_RIGHT.cx, y: EYE_RIGHT.cy });
-  };
-
-  // Highlight offset relative to pupil
-  const hlOffsetX = -10;
-  const hlOffsetY = -10;
+  }, [isHovered, loopWidth]);
 
   return (
     <svg
-      ref={svgRef}
       width={width}
       height={height}
-      viewBox="0 0 349 517"
+      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid meet"
       style={{
-        cursor: "none",
-        filter: isHovered
-          ? "drop-shadow(0 0 18px rgba(80,80,200,0.18))"
-          : "none",
-        transition: "filter 0.3s",
+        width: "100%",
+        height: "100%",
+        display: "block",
+        overflow: "visible",
         ...style,
       }}
       onMouseEnter={() => setLocalHovered(true)}
-      onMouseLeave={() => {
-        setLocalHovered(false);
-        resetPupils();
-      }}
+      onMouseLeave={() => setLocalHovered(false)}
     >
-      {/* Left antenna */}
-      <g
-        style={{
-          transformOrigin: "103.672px 128.293px",
-          transform: `rotate(${antRotL}deg)`,
-          transition: "transform 0.4s cubic-bezier(.34,1.56,.64,1)",
-        }}
-      >
-        <line
-          x1="244.39"
-          y1="126.666"
-          x2="325.111"
-          y2="1.62708"
-          stroke="black"
-          strokeWidth="6"
-          strokeLinecap="round"
-        />
+      <g ref={stripRef}>
+        {strip.map((candle, i) => (
+          <CandleStick key={i} candle={candle} x={i * STRIDE} />
+        ))}
       </g>
-
-      {/* Right antenna */}
-      <g
-        style={{
-          transformOrigin: "103.672px 128.293px",
-          transform: `rotate(${antRotR}deg)`,
-          transition: "transform 0.4s cubic-bezier(.34,1.56,.64,1)",
-        }}
-      >
-        <line
-          x2="103.672"
-          y2="128.293"
-          x1="23"
-          y1="3"
-          stroke="black"
-          strokeWidth="6"
-          strokeLinecap="round"
-        />
-      </g>
-
-      {/* Head */}
-      <rect
-        x="43"
-        y="123.245"
-        width="263"
-        height="168"
-        rx="84"
-        stroke="black"
-        strokeWidth="6"
-        fill="white"
-      />
-
-      {/* Body */}
-      <path
-        d="M99 291.745H250C302.743 291.745 345.5 334.502 345.5 387.245V512.745H99C46.2568 512.745 3.5 469.989 3.5 417.245V387.245C3.5 334.502 46.2568 291.745 99 291.745Z"
-        stroke="black"
-        strokeWidth="7"
-        fill="white"
-      />
-
-      {/* Left eye */}
-      <circle cx="120" cy="207.254" r="39.5" stroke="black" fill="white" />
-      <circle cx={pupilL.x} cy={pupilL.y} r="25.5" fill="black" />
-      <circle
-        cx={pupilL.x + hlOffsetX}
-        cy={pupilL.y + hlOffsetY}
-        r="7"
-        fill="white"
-        opacity="0.6"
-      />
-
-      {/* Right eye */}
-      <circle cx="229" cy="207.254" r="39.5" stroke="black" fill="white" />
-      <circle cx={pupilR.x} cy={pupilR.y} r="25.5" fill="black" />
-      <circle
-        cx={pupilR.x + hlOffsetX}
-        cy={pupilR.y + hlOffsetY}
-        r="7"
-        fill="white"
-        opacity="0.6"
-      />
     </svg>
   );
 }
