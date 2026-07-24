@@ -9,6 +9,7 @@ export interface WalletContextValue {
   provider: BrowserProvider | null;
   contract: Contract | null;
   connectWallet: () => Promise<string | null>;
+  disconnectWallet: () => void;
 }
 
 interface WalletProviderProps {
@@ -104,22 +105,31 @@ export function WalletProvider({ children }: WalletProviderProps) {
     }
   }, []);
 
+  const disconnectWallet = useCallback(() => {
+    setAccount(null);
+    setProvider(null);
+    setContract(null);
+  }, []);
+
   // Account change listener
   useEffect(() => {
     const eth = getMetaMaskEthereum();
     if (!eth) return;
-    const onAccounts = () => {
-      setAccount(null);
-      setContract(null);
-      setProvider(null);
+    const onAccounts = (accounts: unknown) => {
+      const list = accounts as string[];
+      if (list && list.length > 0) {
+        void connectWallet();
+      } else {
+        disconnectWallet();
+      }
     };
     eth.on?.('accountsChanged', onAccounts);
     return () => eth.removeListener?.('accountsChanged', onAccounts);
-  }, []);
+  }, [connectWallet, disconnectWallet]);
 
   const value = useMemo<WalletContextValue>(
-    () => ({ account, provider, contract, connectWallet }),
-    [account, provider, contract, connectWallet]
+    () => ({ account, provider, contract, connectWallet, disconnectWallet }),
+    [account, provider, contract, connectWallet, disconnectWallet]
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;

@@ -3,7 +3,7 @@ import LandingPage from '../components/LandingPage';
 import { useWallet } from '../contexts/WalletContext';
 
 export default function Home() {
-  const { account, connectWallet } = useWallet();
+  const { account, connectWallet, disconnectWallet } = useWallet();
 
   return (
     <>
@@ -11,7 +11,11 @@ export default function Home() {
         <title>ClawX – Prediction Markets on Avalanche</title>
         <meta name="description" content="5-minute prediction markets on Avalanche Fuji with fast median oracle prices. Pick UP or DOWN, settle on-chain." />
       </Head>
-      <LandingPage onConnectWallet={connectWallet} account={account ?? null} />
+      <LandingPage
+        onConnectWallet={connectWallet}
+        onDisconnectWallet={disconnectWallet}
+        account={account ?? null}
+      />
     </>
   );
 }

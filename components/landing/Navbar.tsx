@@ -5,10 +5,19 @@ import CrabLogo from '../svgs/CrabLogo';
 interface NavbarProps {
   account?: string | null;
   onConnect?: () => void;
+  onDisconnect?: () => void;
   onAddWalletClick: () => void;
 }
 
-export default function Navbar({ onAddWalletClick }: NavbarProps) {
+function shortAddress(addr: string) {
+  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+}
+
+export default function Navbar({
+  account,
+  onDisconnect,
+  onAddWalletClick,
+}: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -68,38 +77,97 @@ export default function Navbar({ onAddWalletClick }: NavbarProps) {
         </span>
       </Link>
 
-      {/* Right: Add Wallet Button */}
-      <button
-        onClick={onAddWalletClick}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: '#E74141',
-          color: '#FAF8F3',
-          border: '1.5px solid #E74141',
-          borderRadius: 24,
-          padding: '8px 20px',
-          fontFamily: '"Courier New", monospace',
-          fontSize: 9,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          textDecoration: 'none',
-          cursor: 'pointer',
-          transition: 'all 0.25s ease',
-          whiteSpace: 'nowrap',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = '#B03030';
-          e.currentTarget.style.borderColor = '#B03030';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = '#E74141';
-          e.currentTarget.style.borderColor = '#E74141';
-        }}
-      >
-        Add Wallet
-      </button>
+      {account ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            type="button"
+            onClick={onAddWalletClick}
+            title={account}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              background: '#FAF8F3',
+              color: '#0D0B08',
+              border: '1.5px solid #0D0B08',
+              borderRadius: 24,
+              padding: '8px 14px',
+              fontFamily: '"Courier New", monospace',
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                background: '#27AE60',
+                display: 'inline-block',
+              }}
+            />
+            {shortAddress(account)}
+          </button>
+          <button
+            type="button"
+            onClick={onDisconnect}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'transparent',
+              color: '#C0392B',
+              border: '1.5px solid #C0392B',
+              borderRadius: 24,
+              padding: '8px 14px',
+              fontFamily: '"Courier New", monospace',
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Disconnect
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={onAddWalletClick}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: '#E74141',
+            color: '#FAF8F3',
+            border: '1.5px solid #E74141',
+            borderRadius: 24,
+            padding: '8px 20px',
+            fontFamily: '"Courier New", monospace',
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            textDecoration: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.25s ease',
+            whiteSpace: 'nowrap',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#B03030';
+            e.currentTarget.style.borderColor = '#B03030';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '#E74141';
+            e.currentTarget.style.borderColor = '#E74141';
+          }}
+        >
+          Add Wallet
+        </button>
+      )}
     </nav>
   );
 }
