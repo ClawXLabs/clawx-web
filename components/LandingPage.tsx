@@ -9,14 +9,18 @@ import AddWalletModal, { AddWalletStatus } from './ui/AddWalletModal';
 
 const APP_API_BASE =
   process.env.NEXT_PUBLIC_APP_API_URL?.replace(/\/$/, '') || 'https://app.clawxlab.xyz';
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://app.clawxlab.xyz';
 
 interface LandingPageProps {
   onConnectWallet: () => Promise<string | null>;
+  onDisconnectWallet: () => void;
   account: string | null;
 }
 
-export default function LandingPage({ onConnectWallet, account }: LandingPageProps) {
+export default function LandingPage({
+  onConnectWallet,
+  onDisconnectWallet,
+  account,
+}: LandingPageProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState<AddWalletStatus>('idle');
   const [wallet, setWallet] = useState<string | null>(null);
@@ -24,10 +28,15 @@ export default function LandingPage({ onConnectWallet, account }: LandingPagePro
   const [created, setCreated] = useState(false);
 
   const openModal = useCallback(() => {
-    setStatus('idle');
     setError(null);
-    setCreated(false);
     setWallet(account);
+    if (account) {
+      setStatus('success');
+      setCreated(false);
+    } else {
+      setStatus('idle');
+      setCreated(false);
+    }
     setIsModalOpen(true);
   }, [account]);
 
@@ -74,15 +83,32 @@ export default function LandingPage({ onConnectWallet, account }: LandingPagePro
     }
   }, [account, onConnectWallet, registerWallet]);
 
+  const handleDisconnect = useCallback(() => {
+    onDisconnectWallet();
+    setWallet(null);
+    setStatus('idle');
+    setCreated(false);
+    setError(null);
+  }, [onDisconnectWallet]);
+
   return (
     <div
       className="np-root"
       style={{ background: '#FAF8F3', minHeight: '100vh' }}
     >
-      <Navbar account={account} onConnect={onConnectWallet} onAddWalletClick={openModal} />
+      <Navbar
+        account={account}
+        onConnect={onConnectWallet}
+        onDisconnect={handleDisconnect}
+        onAddWalletClick={openModal}
+      />
 
       <main>
-        <HeroSection account={account} onConnect={onConnectWallet} onAddWalletClick={openModal} />
+        <HeroSection
+          account={account}
+          onConnect={onConnectWallet}
+          onAddWalletClick={openModal}
+        />
         <AssetMarquee />
         <RoleCards />
         <TimelineSection />
@@ -94,11 +120,11 @@ export default function LandingPage({ onConnectWallet, account }: LandingPagePro
         isOpen={isModalOpen}
         onClose={closeModal}
         status={status}
-        wallet={wallet}
+        wallet={wallet || account}
         error={error}
         created={created}
         onAddWallet={handleAddWallet}
-        appUrl={APP_URL}
+        onDisconnect={handleDisconnect}
       />
     </div>
   );

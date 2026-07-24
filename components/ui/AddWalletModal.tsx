@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export type AddWalletStatus = 'idle' | 'connecting' | 'saving' | 'success' | 'error';
 
@@ -10,7 +10,7 @@ interface AddWalletModalProps {
   error: string | null;
   created: boolean;
   onAddWallet: () => void;
-  appUrl?: string;
+  onDisconnect?: () => void;
 }
 
 function shortAddress(addr: string) {
@@ -25,10 +25,8 @@ export default function AddWalletModal({
   error,
   created,
   onAddWallet,
-  appUrl = 'https://app.clawxlab.xyz',
+  onDisconnect,
 }: AddWalletModalProps) {
-  const [hovered, setHovered] = useState(false);
-
   if (!isOpen) return null;
 
   const busy = status === 'connecting' || status === 'saving';
@@ -109,7 +107,7 @@ export default function AddWalletModal({
               lineHeight: 1.2,
             }}
           >
-            {done ? 'Wallet Added' : 'Add Your Wallet'}
+            {done ? 'Wallet Connected' : 'Add Your Wallet'}
           </h2>
 
           <div
@@ -131,22 +129,25 @@ export default function AddWalletModal({
           >
             {done
               ? created
-                ? `You're on the list. Connect ${wallet ? shortAddress(wallet) : 'your wallet'} on the app to start trading.`
-                : `This wallet is already registered. Open the app and connect ${wallet ? shortAddress(wallet) : 'it'} to continue.`
-              : 'Connect MetaMask to register your address for app.clawxlab.xyz access.'}
+                ? 'Your wallet is registered for private beta access.'
+                : 'This wallet is already registered for private beta access.'
+              : 'Connect MetaMask to register your wallet address for private beta access.'}
           </p>
 
-          {wallet && !done && (
+          {wallet && (
             <p
               style={{
                 fontFamily: '"Courier New", monospace',
-                fontSize: '12px',
+                fontSize: '13px',
+                fontWeight: 700,
                 color: '#0D0B08',
                 margin: 0,
                 wordBreak: 'break-all',
+                letterSpacing: '0.02em',
               }}
+              title={wallet}
             >
-              {wallet}
+              {shortAddress(wallet)}
             </p>
           )}
 
@@ -164,32 +165,7 @@ export default function AddWalletModal({
           )}
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '8px' }}>
-            {done ? (
-              <a
-                href={appUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-block',
-                  background: hovered ? '#B03030' : '#E74141',
-                  color: '#FAF8F3',
-                  border: 'none',
-                  padding: '10px 24px',
-                  fontFamily: '"Courier New", monospace',
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  transition: 'background 0.2s ease',
-                }}
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-              >
-                Open App ↗
-              </a>
-            ) : (
+            {!done && (
               <button
                 onClick={onAddWallet}
                 disabled={busy}
@@ -212,7 +188,30 @@ export default function AddWalletModal({
                   ? 'Connecting…'
                   : status === 'saving'
                     ? 'Saving…'
-                    : 'Connect & Add Wallet'}
+                    : 'Connect Wallet'}
+              </button>
+            )}
+
+            {done && onDisconnect && (
+              <button
+                onClick={() => {
+                  onDisconnect();
+                  onClose();
+                }}
+                style={{
+                  background: 'transparent',
+                  color: '#C0392B',
+                  border: '1.5px solid #C0392B',
+                  padding: '10px 20px',
+                  fontFamily: '"Courier New", monospace',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                }}
+              >
+                Disconnect
               </button>
             )}
 
@@ -220,8 +219,8 @@ export default function AddWalletModal({
               onClick={onClose}
               disabled={busy}
               style={{
-                background: 'transparent',
-                color: '#0D0B08',
+                background: done ? '#0D0B08' : 'transparent',
+                color: done ? '#FAF8F3' : '#0D0B08',
                 border: '1.5px solid #0D0B08',
                 padding: '10px 20px',
                 fontFamily: '"Courier New", monospace',
@@ -233,7 +232,7 @@ export default function AddWalletModal({
                 opacity: busy ? 0.4 : 1,
               }}
             >
-              {done ? 'Close' : 'Cancel'}
+              {done ? 'Done' : 'Cancel'}
             </button>
           </div>
         </div>

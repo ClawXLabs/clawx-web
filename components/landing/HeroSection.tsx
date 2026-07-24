@@ -454,8 +454,10 @@ export default function HeroSection({ account, onConnect, onAddWalletClick }: He
             <span
               className="np-cta-primary"
               style={{
-                display: 'inline-block',
-                background: '#E74141',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: account ? '#0D0B08' : '#E74141',
                 color: '#FAF8F3',
                 padding: isMobile ? '10px 20px' : '12px 28px',
                 fontFamily: '"Courier New", monospace',
@@ -465,10 +467,16 @@ export default function HeroSection({ account, onConnect, onAddWalletClick }: He
                 textTransform: 'uppercase',
                 transition: 'background 0.2s ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#B03030'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = '#E74141'; }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = account ? '#3A3530' : '#B03030';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = account ? '#0D0B08' : '#E74141';
+              }}
             >
-              ADD WALLET ↗
+              {account
+                ? `${account.slice(0, 6)}…${account.slice(-4)}`
+                : 'ADD WALLET'}
             </span>
           </button>
         </div>
