@@ -5,10 +5,10 @@ import CrabLogo from '../svgs/CrabLogo';
 interface NavbarProps {
   account?: string | null;
   onConnect?: () => void;
-  onLaunchClick: () => void;
+  onAddWalletClick: () => void;
 }
 
-export default function Navbar({ onLaunchClick }: NavbarProps) {
+export default function Navbar({ onAddWalletClick }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -68,9 +68,9 @@ export default function Navbar({ onLaunchClick }: NavbarProps) {
         </span>
       </Link>
 
-      {/* Right: Go to App Button */}
+      {/* Right: Add Wallet Button */}
       <button
-        onClick={onLaunchClick}
+        onClick={onAddWalletClick}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -98,7 +98,7 @@ export default function Navbar({ onLaunchClick }: NavbarProps) {
           e.currentTarget.style.borderColor = '#E74141';
         }}
       >
-        Go to App
+        Add Wallet
       </button>
     </nav>
   );
