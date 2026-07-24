@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 
 interface Card {
   id: string;
   kicker: string;
   headline: string;
   body: string;
-  cta: { label: string; href: string };
+  ctaLabel: string;
   features: string[];
   dark: boolean;
 }
@@ -17,7 +16,7 @@ const CARDS: Card[] = [
     kicker: '◆ MODE A',
     headline: 'Deploy an Agent',
     body: 'Delegate trading to one of the on-chain AI agents. Approve a TUSDC allowance once, and the agent executes positions autonomously on your behalf based on its encoded strategy.',
-    cta: { label: 'VIEW AGENTS', href: '/agents' },
+    ctaLabel: 'ADD WALLET',
     features: ['Autonomous Execution', 'Permit-Based Delegation', 'Live Activity Feed'],
     dark: true,
   },
@@ -26,16 +25,25 @@ const CARDS: Card[] = [
     kicker: '◆ MODE B',
     headline: 'Trade Manually',
     body: 'Connect your wallet, pick BTC, ETH, or AVAX, and lock a UP or DOWN position before the 5-minute window closes. Chainlink oracle settles the outcome. Winners claim proportional pool rewards.',
-    cta: { label: 'GO TO MARKETS', href: '/markets' },
+    ctaLabel: 'ADD WALLET',
     features: ['Chainlink Oracle Pricing', 'Gasless Entry on Fuji', 'Instant Settlement'],
     dark: false,
   },
 ];
 
-function RoleCardCTA({ label, href }: { label: string; href: string }) {
+function RoleCardCTA({ label, onClick }: { label: string; onClick: () => void }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <Link href={href} style={{ textDecoration: 'none' }}>
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        background: 'none',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+      }}
+    >
       <span
         className="np-role-cta"
         onMouseEnter={() => setHovered(true)}
@@ -57,11 +65,15 @@ function RoleCardCTA({ label, href }: { label: string; href: string }) {
       >
         {label} →
       </span>
-    </Link>
+    </button>
   );
 }
 
-export default function RoleCards() {
+interface RoleCardsProps {
+  onAddWalletClick?: () => void;
+}
+
+export default function RoleCards({ onAddWalletClick }: RoleCardsProps) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -89,7 +101,6 @@ export default function RoleCards() {
         }
       `}</style>
 
-      {/* Section header rule */}
       <div
         style={{
           borderBottom: '1px solid #0D0B08',
@@ -116,7 +127,6 @@ export default function RoleCards() {
         <div style={{ flex: 1, height: 1, background: '#0D0B08' }} />
       </div>
 
-      {/* Two-column card grid */}
       <div className="np-cards-grid" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
         {CARDS.map((card, i) => (
           <div
@@ -150,7 +160,6 @@ export default function RoleCards() {
                 background: card.id === 'agent' ? 'rgba(231, 65, 65, 0.02)' : 'transparent',
               }}
             >
-              {/* HUD techy brackets for Agent card */}
               {card.id === 'agent' && (
                 <>
                   <div style={{ position: 'absolute', top: 8, left: 8, width: 10, height: 10, borderTop: '2px solid #E74141', borderLeft: '2px solid #E74141', pointerEvents: 'none' }} />
@@ -160,7 +169,6 @@ export default function RoleCards() {
                 </>
               )}
 
-              {/* Kicker Header row */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                 <p
                   style={{
@@ -203,7 +211,6 @@ export default function RoleCards() {
                 )}
               </div>
 
-              {/* Headline */}
               <h2
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
@@ -219,7 +226,6 @@ export default function RoleCards() {
                 {card.headline}
               </h2>
 
-              {/* Divider */}
               <div
                 style={{
                   height: 1,
@@ -228,7 +234,6 @@ export default function RoleCards() {
                 }}
               />
 
-              {/* Body */}
               <p
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
@@ -241,7 +246,6 @@ export default function RoleCards() {
                 {card.body}
               </p>
 
-              {/* Feature list */}
               <ul
                 style={{
                   listStyle: 'none',
@@ -273,9 +277,11 @@ export default function RoleCards() {
                 ))}
               </ul>
 
-              {/* CTA */}
               <div style={{ marginTop: 'auto', paddingTop: 8 }}>
-                <RoleCardCTA label={card.cta.label} href={card.cta.href} />
+                <RoleCardCTA
+                  label={card.ctaLabel}
+                  onClick={() => onAddWalletClick?.()}
+                />
               </div>
             </div>
           </div>
