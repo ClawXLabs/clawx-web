@@ -10,6 +10,7 @@ interface HeroSectionProps {
   account: string | null;
   onConnect: () => void;
   onAddWalletClick: () => void;
+  statsRefreshKey?: number;
 }
 
 interface Stat {
@@ -53,7 +54,7 @@ function StatCell({ stat, index, isMobile }: { stat: Stat; index: number; isMobi
   // Define responsive icon styles
   let responsiveIconStyle: React.CSSProperties = {};
   if (isMobile) {
-    if (stat.label === 'AI Agents Enrolled') {
+    if (stat.label === 'Wallets Enrolled') {
       responsiveIconStyle = {
         width: '130px',
         height: '130px',
@@ -209,7 +210,12 @@ function AssetCell({ asset, index }: { asset: Asset; index: number }) {
 }
 
 // ─── Hero Section ───────────────────────────────────────────────────────────
-export default function HeroSection({ account, onConnect, onAddWalletClick }: HeroSectionProps) {
+export default function HeroSection({
+  account,
+  onConnect,
+  onAddWalletClick,
+  statsRefreshKey = 0,
+}: HeroSectionProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [statsData, setStatsData] = useState({
     enrolledWallets: 18,
@@ -227,19 +233,23 @@ export default function HeroSection({ account, onConnect, onAddWalletClick }: He
   }, []);
 
   useEffect(() => {
-    fetch('https://app.clawxlab.xyz/api/v1/stats')
+    const statsUrl =
+      (process.env.NEXT_PUBLIC_APP_API_URL?.replace(/\/$/, '') || 'https://app.clawxlab.xyz') +
+      '/api/v1/stats';
+    let cancelled = false;
+    fetch(statsUrl)
       .then((res) => res.json())
       .then((data) => {
-        if (data && data.ok && data.stats) {
-          setStatsData({
-            enrolledWallets: data.stats.enrolledWallets || 18,
-            totalTransactions: data.stats.totalTransactions || 13614,
-            totalVolumeTusdc: data.stats.totalVolumeTusdc || 112915,
-          });
-        }
+        if (cancelled || !data?.ok || !data.stats) return;
+        setStatsData({
+          enrolledWallets: data.stats.enrolledWallets || 18,
+          totalTransactions: data.stats.totalTransactions || 13614,
+          totalVolumeTusdc: data.stats.totalVolumeTusdc || 112915,
+        });
       })
       .catch((err) => console.error('Error fetching stats:', err));
-  }, []);
+    return () => { cancelled = true; };
+  }, [statsRefreshKey]);
 
   const formatVolume = (val: number) => {
     if (val >= 1000000) {
@@ -257,7 +267,7 @@ export default function HeroSection({ account, onConnect, onAddWalletClick }: He
 
   const stats: Stat[] = [
     {
-      label: 'AI Agents Enrolled',
+      label: 'Wallets Enrolled',
       value: formatNumber(statsData.enrolledWallets),
       hoverBg: '#F69D39',
       hoverColor: '#FAF8F3',

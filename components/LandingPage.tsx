@@ -26,6 +26,7 @@ export default function LandingPage({
   const [wallet, setWallet] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
+  const [statsRefreshKey, setStatsRefreshKey] = useState(0);
 
   const openModal = useCallback(() => {
     setError(null);
@@ -60,6 +61,7 @@ export default function LandingPage({
     setWallet(data.wallet || address);
     setCreated(Boolean(data.created));
     setStatus('success');
+    setStatsRefreshKey((n) => n + 1);
   }, []);
 
   const handleAddWallet = useCallback(async () => {
@@ -108,6 +110,7 @@ export default function LandingPage({
           account={account}
           onConnect={onConnectWallet}
           onAddWalletClick={openModal}
+          statsRefreshKey={statsRefreshKey}
         />
         <AssetMarquee />
         <RoleCards />
