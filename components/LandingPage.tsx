@@ -1,70 +1,105 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Navbar from './landing/Navbar';
 import HeroSection from './landing/HeroSection';
 import AssetMarquee from './landing/AssetMarquee';
 import RoleCards from './landing/RoleCards';
-import MarketsPreview from './landing/MarketsPreview';
 import TimelineSection from './landing/TimelineSection';
 import Footer from './landing/Footer';
-import BetaAlertModal from './ui/BetaAlertModal';
+import AddWalletModal, { AddWalletStatus } from './ui/AddWalletModal';
+
+const APP_API_BASE =
+  process.env.NEXT_PUBLIC_APP_API_URL?.replace(/\/$/, '') || 'https://app.clawxlab.xyz';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://app.clawxlab.xyz';
 
 interface LandingPageProps {
-  onConnectWallet: () => void;
+  onConnectWallet: () => Promise<string | null>;
   account: string | null;
 }
 
-/**
- * LandingPage — Old Newspaper Theme
- * ──────────────────────────────────
- * Structure is intentionally flat and static so that GSAP ScrollTrigger
- * animations can be attached later via class hooks.
- *
- * GSAP hook classes to target:
- *   .np-hero            → Hero entrance
- *   .np-hero-headline   → Headline stagger
- *   .np-hero-h1         → Display headline word-split
- *   .np-hero-deck       → Sub-copy fade
- *   .np-stat-cell       → Stats count-up
- *   .np-marquee-track   → Horizontal scroll override
- *   .np-role-card       → Slide-up stagger on scroll
- *   .np-market-row      → Row stagger on scroll
- *   .np-step            → Column stagger on scroll
- *   .np-footer          → Footer entrance
- */
 export default function LandingPage({ onConnectWallet, account }: LandingPageProps) {
-  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [status, setStatus] = useState<AddWalletStatus>('idle');
+  const [wallet, setWallet] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [created, setCreated] = useState(false);
+
+  const openModal = useCallback(() => {
+    setStatus('idle');
+    setError(null);
+    setCreated(false);
+    setWallet(account);
+    setIsModalOpen(true);
+  }, [account]);
+
+  const closeModal = useCallback(() => {
+    if (status === 'connecting' || status === 'saving') return;
+    setIsModalOpen(false);
+  }, [status]);
+
+  const registerWallet = useCallback(async (address: string) => {
+    setStatus('saving');
+    setError(null);
+    const res = await fetch(`${APP_API_BASE}/api/v1/wallets`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: address }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data?.ok) {
+      throw new Error(data?.error || `Failed to register wallet (${res.status})`);
+    }
+    setWallet(data.wallet || address);
+    setCreated(Boolean(data.created));
+    setStatus('success');
+  }, []);
+
+  const handleAddWallet = useCallback(async () => {
+    setError(null);
+    try {
+      let address = account;
+      if (!address) {
+        setStatus('connecting');
+        address = await onConnectWallet();
+        if (!address) {
+          setStatus('idle');
+          return;
+        }
+      }
+      setWallet(address);
+      await registerWallet(address);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong';
+      setError(message);
+      setStatus('error');
+    }
+  }, [account, onConnectWallet, registerWallet]);
 
   return (
     <div
       className="np-root"
       style={{ background: '#FAF8F3', minHeight: '100vh' }}
     >
-      {/* Fixed navigation */}
-      <Navbar account={account} onConnect={onConnectWallet} onLaunchClick={() => setIsBetaModalOpen(true)} />
+      <Navbar account={account} onConnect={onConnectWallet} onAddWalletClick={openModal} />
 
-      {/* Main editorial content */}
       <main>
-        {/* 1 — Hero: editorial headline + stats grid */}
-        <HeroSection account={account} onConnect={onConnectWallet} onLaunchClick={() => setIsBetaModalOpen(true)} />
-
-        {/* 2 — Scrolling ticker band */}
+        <HeroSection account={account} onConnect={onConnectWallet} onAddWalletClick={openModal} />
         <AssetMarquee />
-
-        {/* 3 — Two-mode cards */}
         <RoleCards />
-
-        {/* 4 — Live markets table */}
-        {/* <MarketsPreview /> */}
-
-        {/* 5 — How it works: 4-step grid */}
         <TimelineSection />
       </main>
 
-      {/* Dark editorial footer */}
       <Footer account={account} onConnect={onConnectWallet} />
 
-      {/* Private Beta Modal */}
-      <BetaAlertModal isOpen={isBetaModalOpen} onClose={() => setIsBetaModalOpen(false)} />
+      <AddWalletModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        status={status}
+        wallet={wallet}
+        error={error}
+        created={created}
+        onAddWallet={handleAddWallet}
+        appUrl={APP_URL}
+      />
     </div>
   );
 }

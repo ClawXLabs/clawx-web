@@ -9,7 +9,7 @@ import CrabLogoOutline from '../svgs/CrabLogoOutline';
 interface HeroSectionProps {
   account: string | null;
   onConnect: () => void;
-  onLaunchClick: () => void;
+  onAddWalletClick: () => void;
 }
 
 interface Stat {
@@ -209,7 +209,7 @@ function AssetCell({ asset, index }: { asset: Asset; index: number }) {
 }
 
 // ─── Hero Section ───────────────────────────────────────────────────────────
-export default function HeroSection({ account, onConnect, onLaunchClick }: HeroSectionProps) {
+export default function HeroSection({ account, onConnect, onAddWalletClick }: HeroSectionProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [statsData, setStatsData] = useState({
     enrolledWallets: 18,
@@ -442,7 +442,7 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
           </p>
 
           <button
-            onClick={onLaunchClick}
+            onClick={onAddWalletClick}
             style={{
               background: 'none',
               border: 'none',
@@ -468,7 +468,7 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
               onMouseEnter={(e) => { e.currentTarget.style.background = '#B03030'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = '#E74141'; }}
             >
-              LAUNCH DASHBOARD ↗
+              ADD WALLET ↗
             </span>
           </button>
         </div>
