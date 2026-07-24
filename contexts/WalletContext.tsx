@@ -1,6 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
 import { ethers, BrowserProvider, Contract } from 'ethers';
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from '../utils/contract';
+import {
+  clearPersistedWallet,
+  getPersistedWallet,
+  persistConnectedWallet,
+  pickPreferredAccount,
+} from '../utils/walletSession';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -48,7 +54,21 @@ export function WalletProvider({ children }: WalletProviderProps) {
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [contract, setContract] = useState<Contract | null>(null);
 
-  // Auto-restore session on mount
+  const applyConnected = useCallback(async (eth: EthProvider, addressHint?: string) => {
+    const nextProvider = new ethers.BrowserProvider(eth as unknown as ethers.Eip1193Provider);
+    const signer = addressHint
+      ? await nextProvider.getSigner(addressHint)
+      : await nextProvider.getSigner();
+    const address = await signer.getAddress();
+    const marketContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    setAccount(address);
+    setProvider(nextProvider);
+    setContract(marketContract);
+    persistConnectedWallet(address);
+    return address;
+  }, []);
+
+  // Auto-restore from shared cookie/localStorage + MetaMask
   useEffect(() => {
     const eth = getMetaMaskEthereum();
     if (!eth) return;
@@ -56,23 +76,19 @@ export function WalletProvider({ children }: WalletProviderProps) {
     let cancelled = false;
     const restore = async () => {
       try {
+        const preferred = getPersistedWallet();
         const accounts = await eth.request({ method: 'eth_accounts' }) as string[];
-        if (cancelled || !accounts?.[0]) return;
-        const nextProvider = new ethers.BrowserProvider(eth as unknown as ethers.Eip1193Provider);
-        const signer = await nextProvider.getSigner();
-        const address = await signer.getAddress();
-        const marketContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-        setAccount(address);
-        setProvider(nextProvider);
-        setContract(marketContract);
+        if (cancelled) return;
+        const chosen = pickPreferredAccount(accounts || [], preferred);
+        if (!chosen) return;
+        await applyConnected(eth, chosen);
       } catch { /* ignore */ }
     };
 
     restore();
     return () => { cancelled = true; };
-  }, []);
+  }, [applyConnected]);
 
-  // Connect
   const connectWallet = useCallback(async (): Promise<string | null> => {
     const eth = getMetaMaskEthereum();
     if (!eth) {
@@ -87,14 +103,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
 
     try {
       await eth.request({ method: 'eth_requestAccounts' });
-      const nextProvider = new ethers.BrowserProvider(eth as unknown as ethers.Eip1193Provider);
-      const signer = await nextProvider.getSigner();
-      const address = await signer.getAddress();
-      const marketContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      setAccount(address);
-      setProvider(nextProvider);
-      setContract(marketContract);
-      return address;
+      return await applyConnected(eth);
     } catch (error: unknown) {
       const err = error as { message?: string; shortMessage?: string };
       console.error('Wallet connect:', err);
@@ -103,15 +112,15 @@ export function WalletProvider({ children }: WalletProviderProps) {
       }
       return null;
     }
-  }, []);
+  }, [applyConnected]);
 
   const disconnectWallet = useCallback(() => {
     setAccount(null);
     setProvider(null);
     setContract(null);
+    clearPersistedWallet();
   }, []);
 
-  // Account change listener
   useEffect(() => {
     const eth = getMetaMaskEthereum();
     if (!eth) return;
@@ -120,12 +129,15 @@ export function WalletProvider({ children }: WalletProviderProps) {
       if (list && list.length > 0) {
         void connectWallet();
       } else {
-        disconnectWallet();
+        setAccount(null);
+        setContract(null);
+        setProvider(null);
+        clearPersistedWallet();
       }
     };
     eth.on?.('accountsChanged', onAccounts);
     return () => eth.removeListener?.('accountsChanged', onAccounts);
-  }, [connectWallet, disconnectWallet]);
+  }, [connectWallet]);
 
   const value = useMemo<WalletContextValue>(
     () => ({ account, provider, contract, connectWallet, disconnectWallet }),
