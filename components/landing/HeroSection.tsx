@@ -212,7 +212,7 @@ function AssetCell({ asset, index }: { asset: Asset; index: number }) {
 export default function HeroSection({ account, onConnect, onLaunchClick }: HeroSectionProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [statsData, setStatsData] = useState({
-    activeAgents: 18,
+    enrolledWallets: 18,
     totalTransactions: 13614,
     totalVolumeTusdc: 112915,
   });
@@ -232,7 +232,7 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
       .then((data) => {
         if (data && data.ok && data.stats) {
           setStatsData({
-            activeAgents: data.stats.activeAgents || data.stats.enrolledWallets || 18,
+            enrolledWallets: data.stats.enrolledWallets || 18,
             totalTransactions: data.stats.totalTransactions || 13614,
             totalVolumeTusdc: data.stats.totalVolumeTusdc || 112915,
           });
@@ -258,7 +258,7 @@ export default function HeroSection({ account, onConnect, onLaunchClick }: HeroS
   const stats: Stat[] = [
     {
       label: 'AI Agents Enrolled',
-      value: formatNumber(statsData.activeAgents),
+      value: formatNumber(statsData.enrolledWallets),
       hoverBg: '#F69D39',
       hoverColor: '#FAF8F3',
       IconComponent: RoboAgent,
