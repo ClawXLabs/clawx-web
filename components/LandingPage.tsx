@@ -113,7 +113,7 @@ export default function LandingPage({
           statsRefreshKey={statsRefreshKey}
         />
         <AssetMarquee />
-        <RoleCards />
+        <RoleCards onAddWalletClick={openModal} />
         <TimelineSection />
       </main>
 
