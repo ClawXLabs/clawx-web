@@ -6,6 +6,7 @@ import RoleCards from './landing/RoleCards';
 import TimelineSection from './landing/TimelineSection';
 import Footer from './landing/Footer';
 import AddWalletModal, { AddWalletStatus } from './ui/AddWalletModal';
+import { persistConnectedWallet } from '../utils/walletSession';
 
 const APP_API_BASE =
   process.env.NEXT_PUBLIC_APP_API_URL?.replace(/\/$/, '') || 'https://app.clawxlab.xyz';
@@ -52,14 +53,23 @@ export default function LandingPage({
     const res = await fetch(`${APP_API_BASE}/api/v1/wallets`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallet: address }),
+      body: JSON.stringify({
+        wallet: address,
+        source: 'landing',
+        referrer:
+          typeof window !== 'undefined'
+            ? window.location.href
+            : 'https://clawxlab.xyz',
+      }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data?.ok) {
       throw new Error(data?.error || `Failed to register wallet (${res.status})`);
     }
-    setWallet(data.wallet || address);
+    const stored = data.wallet || address;
+    setWallet(stored);
     setCreated(Boolean(data.created));
+    persistConnectedWallet(stored);
     setStatus('success');
     setStatsRefreshKey((n) => n + 1);
   }, []);
