@@ -219,7 +219,7 @@ export default function HeroSection({
   const [isMobile, setIsMobile] = useState(false);
   const [statsData, setStatsData] = useState({
     enrolledWallets: 18,
-    totalTransactions: 13614,
+    totalTransactions: 66738,
     totalVolumeTusdc: 112915,
   });
 
@@ -233,17 +233,18 @@ export default function HeroSection({
   }, []);
 
   useEffect(() => {
-    const statsUrl =
-      (process.env.NEXT_PUBLIC_APP_API_URL?.replace(/\/$/, '') || 'https://app.clawxlab.xyz') +
-      '/api/v1/stats';
+    // Local API: Snowtrace-backed on-chain tx count (app.clawxlab.xyz is often down).
     let cancelled = false;
-    fetch(statsUrl)
+    fetch('/api/stats')
       .then((res) => res.json())
       .then((data) => {
         if (cancelled || !data?.ok || !data.stats) return;
         setStatsData({
           enrolledWallets: data.stats.enrolledWallets || 18,
-          totalTransactions: data.stats.totalTransactions || 13614,
+          totalTransactions:
+            data.stats.onchainContractTxs ||
+            data.stats.totalTransactions ||
+            66738,
           totalVolumeTusdc: data.stats.totalVolumeTusdc || 112915,
         });
       })
@@ -274,7 +275,7 @@ export default function HeroSection({
       IconComponent: RoboAgent,
     },
     {
-      label: 'Rounds Settled',
+      label: 'On-chain Txs',
       value: formatNumber(statsData.totalTransactions),
       hoverBg: '#C0392B',
       hoverColor: '#FAF8F3',
