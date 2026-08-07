@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 import RoboAgent from './Icons/RoboAgent';
 import SettledRounds from './Icons/SettledRounds';
 import Volumes from './Icons/Volumes';
 import FiveMinTimer from './Icons/5minTImer';
 import CrabLogoOutline from '../svgs/CrabLogoOutline';
+import { CONTRACT_ADDRESS } from '../../utils/contract';
+
+const SNOWTRACE_CONTRACT_URL = `https://testnet.snowtrace.io/address/${CONTRACT_ADDRESS}`;
 
 interface HeroSectionProps {
   account: string | null;
@@ -18,6 +21,7 @@ interface Stat {
   value: string;
   hoverBg: string;
   hoverColor: string;
+  href?: string;
   IconComponent?: React.ComponentType<{
     width?: string;
     height?: string;
@@ -49,7 +53,7 @@ function StatCell({ stat, index, isMobile }: { stat: Stat; index: number; isMobi
 
   const isRightCol = index % 2 !== 0;
   const isBottomRow = index >= 2;
-  const flushBottom = stat.label === 'Rounds Settled';
+  const flushBottom = stat.label === 'On-chain Txs';
 
   // Define responsive icon styles
   let responsiveIconStyle: React.CSSProperties = {};
@@ -61,7 +65,7 @@ function StatCell({ stat, index, isMobile }: { stat: Stat; index: number; isMobi
         right: '-10px',
         bottom: '0px',
       };
-    } else if (stat.label === 'Rounds Settled') {
+    } else if (stat.label === 'On-chain Txs') {
       responsiveIconStyle = {
         width: '120px',
         height: '120px',
@@ -140,9 +144,34 @@ function StatCell({ stat, index, isMobile }: { stat: Stat; index: number; isMobi
           transition: 'color 0.25s ease',
           position: 'relative',
           zIndex: 1,
+          display: 'inline-flex',
+          alignItems: 'flex-start',
+          gap: 4,
         }}
       >
-        {stat.value}
+        <span>{stat.value}</span>
+        {stat.href ? (
+          <a
+            href={stat.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="View on Snowtrace"
+            aria-label="View contract transactions on Snowtrace"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: isMobile ? 2 : 4,
+              color: hovered ? stat.hoverColor : '#0D0B08',
+              opacity: hovered ? 0.95 : 0.55,
+              transition: 'opacity 0.2s ease, color 0.25s ease',
+              lineHeight: 0,
+            }}
+          >
+            <ArrowUpRight size={isMobile ? 12 : 14} strokeWidth={2.5} />
+          </a>
+        ) : null}
       </div>
 
       {/* Label */}
@@ -279,6 +308,7 @@ export default function HeroSection({
       value: formatNumber(statsData.totalTransactions),
       hoverBg: '#C0392B',
       hoverColor: '#FAF8F3',
+      href: SNOWTRACE_CONTRACT_URL,
       IconComponent: SettledRounds,
       iconStyle: {
         right: '12px',
